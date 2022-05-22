@@ -4,7 +4,7 @@ export const HANDLE_SIZE = 5;
 
 export class BaseShape {
 
-  protected fillStyle = 'transparent';
+  protected fillStyle = '#fff';
   protected handleFillStyle = '#000';
 
   protected shadow = {
@@ -49,7 +49,7 @@ export class BaseShape {
 				ctx.shadowOffsetX = this.shadow.offsetX;
 				ctx.shadowOffsetY = this.shadow.offsetY;
 			} else {
-				ctx.shadowBlur = 0;
+        ctx.shadowBlur = 0;
 			}
 			ctx.fill();
 
