@@ -1,10 +1,9 @@
-<h1 align="center">ngx-drawing-board</h1>
+# [Ngx-drawing-board](https://github.com/andrew1931/ngx-drawing-board/blob/main/src)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/andrew1931/ngx-drawing-board/blob/main/LICENSE)
+ [![npm version](https://img.shields.io/npm/v/ngx-drawing-board?color=brightgreen&label=npm%20package)](https://www.npmjs.com/package/ngx-drawing-board) 
 
-<p align="center">
-  <br>
-  <i>The ngx-drawing-board is a canvas area where you can draw, resize and drag shapes with a mouse.</i>
-  <br>
-</p>
+
+Angular library to draw, resize and drag shapes with a mouse on canvas
 
 Contents
 ========
