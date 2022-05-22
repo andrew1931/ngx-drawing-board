@@ -109,16 +109,25 @@ export class NgxCanvasDrawer implements OnInit, AfterViewInit, OnChanges, OnDest
     private elips: Elips
   ) {}
 
+  /**
+  * Re-draw all elements when `this.elements` list changes
+  */
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.elements && this.canvas) {
       this.drawElemets();
     }
   };
 
+  /**
+  * Init canvas size and background
+  */
   ngOnInit(): void {
     this.setCanvasSizeAndBackground();
   };
 
+  /**
+  * Init newElement and canvas properties, draw initial elemets, set event listeners
+  */
   ngAfterViewInit(): void {
     this.newElement = this.emptyElement;
     this.canvas = this.canvasEl.nativeElement;
@@ -133,6 +142,9 @@ export class NgxCanvasDrawer implements OnInit, AfterViewInit, OnChanges, OnDest
     });
   };
 
+  /**
+  * Remove event listeners
+  */
   ngOnDestroy(): void {
     this.canvas.removeEventListener('mousedown', this.mouseDownListener);
     this.canvas.removeEventListener('mousemove', this.handleMouseMovement);
@@ -140,8 +152,10 @@ export class NgxCanvasDrawer implements OnInit, AfterViewInit, OnChanges, OnDest
     window.removeEventListener('mouseup', this.mouseUpListener);
   };
 
+  /**
+  * Handle canvas mouse up
+  */
 	mouseUpListener = (e: MouseEvent): void => {
-    console.log('up')
     e.preventDefault();
     e.stopPropagation();
 
@@ -167,11 +181,14 @@ export class NgxCanvasDrawer implements OnInit, AfterViewInit, OnChanges, OnDest
         this.onAddElement.emit(newElem);
         this.newElement = this.emptyElement;
         this.drawElemets();
-        console.log(this.elements)
 			}
 		}
 	};
 
+  /**
+  * Handle canvas mouse down
+  * @param mouseEvent
+  */
 	mouseDownListener = (e: MouseEvent): void => {
     e.preventDefault();
     e.stopPropagation();
@@ -189,6 +206,10 @@ export class NgxCanvasDrawer implements OnInit, AfterViewInit, OnChanges, OnDest
     this.drawElemets();
 	};
 
+  /**
+  * Handle canvas mouse movement during drawing, resizing, draging
+  * @param mouseEvent
+  */
 	mouseMoveListener = (e: MouseEvent): void => {
     e.preventDefault();
     e.stopPropagation();
@@ -234,10 +255,13 @@ export class NgxCanvasDrawer implements OnInit, AfterViewInit, OnChanges, OnDest
 	  }
 	};
 
+  /**
+  * Draw all elements from `this.elements` list
+  */
 	drawElemets = (): void => {
 		this.rectangle.clearFeild(this.ctx, this.canvasWidth$.value, this.canvasHeight$.value);
 
-		for (let [index, elem] of  this.elements.entries()) {
+		for (let [index, elem] of this.elements.entries()) {
       const drawProps = {
         ctx: this.ctx,
         elem,
@@ -259,6 +283,9 @@ export class NgxCanvasDrawer implements OnInit, AfterViewInit, OnChanges, OnDest
 		}
   };
 
+  /**
+  * Draw new element
+  */
   drawNewElement = (): void => {
     const drawProps = {
       ctx: this.ctx,
@@ -274,6 +301,10 @@ export class NgxCanvasDrawer implements OnInit, AfterViewInit, OnChanges, OnDest
     }
   };
 
+  /**
+  * Handle canvas mouse movement when mouse is up
+  * @param mouseEvent
+  */
   handleMouseMovement = (e: MouseEvent): void => {
   	if (this.mouseIsDown) {
       return;
@@ -323,6 +354,9 @@ export class NgxCanvasDrawer implements OnInit, AfterViewInit, OnChanges, OnDest
     setCursorType(this.dragableElementIndex, this.currentHandle);
   };
 
+  /**
+  * Set initial canvas size and background
+  */
   setCanvasSizeAndBackground(): void {
     this.canvasWidth$.next(this.width);
     this.canvasHeight$.next(this.height);
