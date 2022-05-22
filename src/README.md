@@ -59,13 +59,13 @@ export class SomeModule {}
 | Output  | Arguments | Description |
 | ------------- | ------------- | -------------
 | (onAddElement) | ILayoutElement | Fires when new element has been drawn on canvas |
-| (onFocusElement) | number (element index) |Fires when element has been clicked |
+| (onClickElement) | number (element index) |Fires when element has been clicked |
+| (onFocusElement) | number (element index) |Fires when element gets focus |
 | (onBlurElement) | number (element index) | Fires when selected element looses focus |
 | (onMouseEnterElement) | number (element index) | Fires when mouse enteres element |
 | (onMouseLeaveElement) | number (element index) | Fires when mouse leaves element |
 | (onResizeEnd) | void | Fires when element's resizing is over |
 | (onDragEnd) | void | Fires when element's draging is over |
-
 
 ## Interfaces
 ```ts

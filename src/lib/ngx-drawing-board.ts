@@ -57,6 +57,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() elements: ILayoutElement[] = [];
 
   @Output() onAddElement = new EventEmitter<ILayoutElement>();
+  @Output() onClickElement = new EventEmitter<number>();
   @Output() onFocusElement = new EventEmitter<number>();
   @Output() onBlurElement = new EventEmitter<number>();
   @Output() onMouseEnterElement = new EventEmitter<number>();
@@ -238,10 +239,17 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 		this.newElement.y = e.clientY - this.canvasY;
 		this.mouseIsDown = true;
     if (this.dragableElementIndex >= 0) {
-      this.selectedElementIndex = this.dragableElementIndex;
+
       this.zone.run(() => {
-        this.onFocusElement.emit(this.selectedElementIndex);
+        this.onClickElement.emit(this.dragableElementIndex);
       });
+
+      if (this.selectedElementIndex !== this.dragableElementIndex) {
+        this.selectedElementIndex = this.dragableElementIndex;
+        this.zone.run(() => {
+          this.onFocusElement.emit(this.selectedElementIndex);
+        });
+      }
     } else {
       this.selectedElementIndex = -1;
       this.zone.run(() => {
