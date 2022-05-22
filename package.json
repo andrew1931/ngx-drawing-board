@@ -1,6 +1,5 @@
 {
-  "name": "ngx-canvas-drawboard-workspace",
-  "version": "0.2.0-rc",
+  "repository": "src",
   "scripts": {
     "ng": "ng",
     "build": "ng build",

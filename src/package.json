@@ -1,7 +1,13 @@
 {
   "name": "ngx-canvas-drawboard",
   "version": "0.2.0-rc",
-  "keywords" :["angular","canvas", "drawing", "resizing", "drag & drop"],
+  "keywords": [
+    "angular",
+    "canvas",
+    "drawing",
+    "resizing",
+    "drag & drop"
+  ],
   "license": "MIT",
   "author": "andrew1931",
   "description": "Canvas drawing board for Angular to draw, drag & drop and resize shapes",
@@ -9,7 +15,8 @@
     "type": "git",
     "url": "https://github.com/andrew1931/ngx-canvas-drawboard"
   },
-  "homepage" :"https://github.com/andrew1931/ngx-canvas-drawboard",
+  "homepage": "https://github.com/andrew1931/ngx-canvas-drawboard",
+  "private": true,
   "peerDependencies": {
     "@angular/common": "^13.3.0",
     "@angular/core": "^13.3.0"
