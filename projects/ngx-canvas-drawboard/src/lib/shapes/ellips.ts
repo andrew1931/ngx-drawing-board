@@ -3,7 +3,7 @@ import { IDrawElement } from '../types';
 import { BaseShape } from './base';
 
 @Injectable()
-export class Elips extends BaseShape {
+export class Ellips extends BaseShape {
 
   override drawElemet(props: IDrawElement): void {
     if (props.ctx === null) {

@@ -35,4 +35,4 @@ export enum EMouseHandle {
 	right = 'right',
 };
 
-export type Shape = 'rectangle' | 'elips';
+export type Shape = 'rectangle' | 'ellips';

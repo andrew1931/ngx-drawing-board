@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { NgxCanvasDrawboard } from './ngx-canvas-drawboard';
-import { Rectangle, Elips } from './shapes';
+import { Rectangle, Ellips } from './shapes';
 
 
 @NgModule({
   declarations: [ NgxCanvasDrawboard ],
   exports: [ NgxCanvasDrawboard ],
   imports: [ CommonModule ],
-  providers: [ Rectangle, Elips ]
+  providers: [ Rectangle, Ellips ]
 })
 export class NgxCanvasDrawboardModule {}

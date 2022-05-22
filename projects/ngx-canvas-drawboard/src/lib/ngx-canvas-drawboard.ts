@@ -20,7 +20,7 @@ import {
   map,
   Subscription
 } from 'rxjs';
-import { Rectangle, Elips } from './shapes';
+import { Rectangle, Ellips } from './shapes';
 import { ILayoutElement, EMouseHandle, IPoint, Shape } from './types';
 import {
   convertElemntNegativeProps,
@@ -114,7 +114,7 @@ export class NgxCanvasDrawboard implements OnInit, AfterViewInit, OnChanges, OnD
   constructor(
     private readonly zone: NgZone,
     private rectangle: Rectangle,
-    private elips: Elips
+    private ellips: Ellips
   ) {}
 
   /**
@@ -312,7 +312,7 @@ export class NgxCanvasDrawboard implements OnInit, AfterViewInit, OnChanges, OnD
       }
 
       if (isCircle(elem)) {
-        this.elips.drawElemet(drawProps);
+        this.ellips.drawElemet(drawProps);
       }
 
       if (index === this.selectedElementIndex) {
@@ -335,7 +335,7 @@ export class NgxCanvasDrawboard implements OnInit, AfterViewInit, OnChanges, OnD
     }
 
     if (isCircle(this.newElement)) {
-      this.elips.drawElemet(drawProps);
+      this.ellips.drawElemet(drawProps);
     }
   };
 

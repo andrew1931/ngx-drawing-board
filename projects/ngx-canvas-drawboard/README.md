@@ -52,7 +52,7 @@ Define options in your consuming component:
 | elements | ILayoutElement | undefined | yes | List where all drawn elements are stored |
 | width | number | 600 | no | width of canvas |
 | height | number | 600 | no | height of canvas |
-| shape | 'rectangle' \| 'elips' | 'rectangle' | no | current drawing shape |
+| shape | 'rectangle' \| 'ellips' | 'rectangle' | no | current drawing shape |
 | backgroundImage | string | '' | no | canvas background image |
 | backgroundColor | string | '#f2f2f2' | no | canvas background color |
 | fitCanvasToImage | boolean | true | no | makes canvas the same size as provided background image |
@@ -76,7 +76,7 @@ Define options in your consuming component:
       y: number;
       width: number;
       height: number;
-      shape: 'rectangle' | 'elips';
+      shape: 'rectangle' | 'ellips';
       color?: string // default is '#ffffff';
     }
 ```

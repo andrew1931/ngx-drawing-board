@@ -1,2 +1,2 @@
 export * from './rectangle';
-export * from './elips';
+export * from './ellips';
