@@ -14,6 +14,14 @@ export class BaseShape {
     offsetY: 0
   };
 
+  protected text = {
+    defaultFontWeight: 300,
+    defaultFontSize: '18px',
+    defaultFontFamily: 'Arial',
+    defaultFontStyle: 'normal',
+    defaultColor: '#000'
+  }
+
   public clearFeild(ctx: CanvasRenderingContext2D | null, width: number, height: number): void {
     if (ctx) {
       ctx.clearRect(0, 0, width, height);
@@ -44,6 +52,34 @@ export class BaseShape {
 			ctx.lineWidth = 1;
 			ctx.stroke();
 		}
+    if (elem.text && elem.text.value) {
+      const { value, fontWeight, fontSize, fontFamily, fontStyle, color, align } = elem.text;
+      const { defaultColor, defaultFontFamily, defaultFontSize, defaultFontStyle, defaultFontWeight } = this.text;
+
+
+      const font = (fontStyle || defaultFontStyle) + ' ' + (fontWeight || defaultFontWeight) + ' ' + (fontSize || defaultFontSize) + ' ' + (fontFamily || defaultFontFamily);
+      ctx.fillStyle = color || defaultColor;
+      ctx.font = font
+
+
+      ctx.textBaseline = 'middle';
+      let textX = elem.x + (elem.width / 2);
+      let textY = elem.y + (elem.height / 2);
+
+      if (!align || align === 'center') {
+        ctx.textAlign = 'center';
+      }
+      if (align === 'left') {
+        textX = elem.x;
+      }
+
+      if (align === 'right') {
+        textX = elem.x + elem.width;
+        ctx.textAlign = 'right';
+      }
+
+      ctx.fillText(value, textX, textY, elem.width);
+    }
 	};
 
   public drawHandles({ ctx, elem }: IDrawHandle): void {

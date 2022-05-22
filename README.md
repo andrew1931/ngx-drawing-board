@@ -72,13 +72,25 @@ Define options in your consuming component:
 ## Interfaces
 ```ts
   interface ILayoutElement {
-      x: number;
-      y: number;
-      width: number;
-      height: number;
-      shape: 'rectangle' | 'ellips';
-      color?: string // default is '#ffffff';
-    }
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    shape: 'rectangle' | 'ellips',
+    color?: string,
+    text?: ILayoutElementText,
+  };
+
+
+  interface ILayoutElementText {
+    value: string,
+    color?: string,
+    fontWeight?: 100 | 200 | 300 | 400 | 500 | 600,
+    fontFamily?: string,
+    fontStyle?: string,
+    fontSize?: string,
+    align?: 'left' | 'center' | 'right',
+  };
 ```
 
 ## License

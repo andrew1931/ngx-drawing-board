@@ -105,7 +105,11 @@ export class NgxCanvasDrawboard implements OnInit, AfterViewInit, OnChanges, OnD
       width: 0,
       height: 0,
       shape: this.shape,
-      color: '#ffffff'
+      color: '#ffffff',
+      text: {
+        value: 'test value',
+        fontSize: '44px',
+      }
     };
 	};
 

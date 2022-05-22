@@ -5,6 +5,17 @@ export interface ILayoutElement {
 	height: number,
   shape: Shape,
   color: string,
+  text?: ILayoutElementText,
+};
+
+export interface ILayoutElementText {
+  value: string,
+  color?: string,
+  fontWeight?: 100 | 200 | 300 | 400 | 500 | 600,
+  fontFamily?: string,
+  fontStyle?: string,
+  fontSize?: string,
+  align?: 'left' | 'center' | 'right',
 };
 
 export interface IDrawElement {
