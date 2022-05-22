@@ -38,7 +38,7 @@ import {
 	    [height]="canvasHeight$ | async"
     ></canvas>
   `,
-  changeDetection: ChangeDetectionStrategy.Default
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxCanvasDrawer implements OnInit, AfterViewInit, OnChanges, OnDestroy {
 
@@ -107,8 +107,7 @@ export class NgxCanvasDrawer implements OnInit, AfterViewInit, OnChanges, OnDest
     private readonly zone: NgZone,
     private rectangle: Rectangle,
     private elips: Elips
-  ) {
-  }
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.elements && this.canvas) {
@@ -135,12 +134,10 @@ export class NgxCanvasDrawer implements OnInit, AfterViewInit, OnChanges, OnDest
   };
 
   ngOnDestroy(): void {
-    this.zone.runOutsideAngular(() => {
-      this.canvas.removeEventListener('mousedown', this.mouseDownListener);
-      this.canvas.removeEventListener('mousemove', this.handleMouseMovement);
-      window.removeEventListener('mousemove', this.mouseMoveListener);
-      window.removeEventListener('mouseup', this.mouseUpListener);
-    })
+    this.canvas.removeEventListener('mousedown', this.mouseDownListener);
+    this.canvas.removeEventListener('mousemove', this.handleMouseMovement);
+    window.removeEventListener('mousemove', this.mouseMoveListener);
+    window.removeEventListener('mouseup', this.mouseUpListener);
   };
 
 	mouseUpListener = (e: MouseEvent): void => {
