@@ -3,5 +3,37 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-  }
+    "ngx-canvas-drawer": {
+      "projectType": "library",
+      "root": "projects/ngx-canvas-drawer",
+      "sourceRoot": "projects/ngx-canvas-drawer/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/ngx-canvas-drawer/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngx-canvas-drawer/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ngx-canvas-drawer/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-canvas-drawer/src/test.ts",
+            "tsConfig": "projects/ngx-canvas-drawer/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-canvas-drawer/karma.conf.js"
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "ngx-canvas-drawer"
 }

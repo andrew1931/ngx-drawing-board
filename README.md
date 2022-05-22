@@ -1,27 +1,81 @@
-# NgWorkspace
+# ngx-canvas-drawer
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.3.6.
+Contents
+========
+- [Getting started](#getting-started)
+- [Usage](#usage)
+- [API](#api)
+- [Interfaces](#interfaces)
+- [License](#license)
 
-## Development server
+## Getting started
+### Step 1: Install `ngx-canvas-drawer`:
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+```bash
+npm install ng2-canvas-drawer --save
+```
 
-## Code scaffolding
+### Step 2: Import NgxCanvasDrawerModule:
+```js
+import { NgxCanvasDrawerModule } from 'ngx-canvas-drawer';
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+@NgModule({
+  ...
+  imports: [..., NgxCanvasDrawerModule],
+  ...
+})
+export class SomeModule {}
+```
 
-## Build
+## Usage
+Define options in your consuming component:
+```html
+<ngx-canvas-drawer
+    [elements]="[]"
+    [shape]="rectangle"
+    [width]="1024"
+    [height]="724"
+  >
+  </ngx-canvas-drawer>
+```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## API
+### Inputs
+| Input  | Type | Default | Required | Description |
+| ------------- | ------------- | ------------- | ------------- | ------------- |
+| elements | ILayoutElement | undefined | yes | List where all drawn elements are stored |
+| width | number | 600 | no | width of canvas |
+| height | number | 600 | no | height of canvas |
+| shape | 'rectangle' \| 'elips' | 'rectangle' | no | current drawing shape |
+| backgroundImage | string | '' | no | canvas background image |
+| backgroundColor | string | '#f2f2f2' | no | canvas background color |
+| fitCanvasToImage | boolean | true | no | makes canvas the same size as provided background image |
 
-## Running unit tests
+### Outputs
+| Output  | Description |
+| ------------- | ------------- |
+| (onAddElement)  | Fires when new element has been drawn on canvas |
+| (onFocusElement)  | Fires when element has been clicked |
+| (onBlurElement)  | Fires when selected element looses focus |
+| (onMouseEnterElement)  | Fires when mouse enteres element |
+| (onMouseLeaveElement)  | Fires when mouse leaves element |
+| (onResizeEnd)  | Fires when element's resizing is over |
+| (onDragEnd)  | Fires when element's draging is over |
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
-## Running end-to-end tests
+## Interfaces
+```ts
+  interface ILayoutElement {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      shape: 'rectangle' | 'elips';
+      color?: string // default is '#ffffff';
+    }
+```
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## License
 
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+The MIT License (see the [LICENSE](https://github.com/valor-software/ng2-charts/blob/master/LICENSE) file for the full
+text)
