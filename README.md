@@ -77,5 +77,5 @@ Define options in your consuming component:
 
 ## License
 
-The MIT License (see the [LICENSE](https://github.com/andrew1931/ngx-canvas-drawer/blob/main/LICENSE.md) file for the full
+The MIT License (see the [LICENSE](https://github.com/andrew1931/ngx-canvas-drawer/blob/main/LICENSE) file for the full
 text)
