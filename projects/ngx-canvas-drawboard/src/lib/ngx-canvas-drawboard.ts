@@ -153,7 +153,7 @@ export class NgxCanvasDrawboard implements OnInit, AfterViewInit, OnChanges, OnD
   };
 
   /**
-  * Init mousedown, mousemove, mousemove event listeners
+  * Init mousedown, mouseup, mousemove event listeners
   */
   private initEventsSubscriptions(): void {
     const canvasMouseDown$ = fromEvent(this.canvas, 'mousedown');
