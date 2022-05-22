@@ -4,9 +4,9 @@ export const HANDLE_SIZE = 5;
 
 export class BaseShape {
 
-  protected fillStyle = '#FAF7F8';
-  protected strokeStyle = '#000';
+  protected fillStyle = 'transparent';
   protected handleFillStyle = '#000';
+
   protected shadow = {
     color: '#ccc',
     blur: 10,
@@ -20,7 +20,12 @@ export class BaseShape {
     defaultFontFamily: 'Arial',
     defaultFontStyle: 'normal',
     defaultColor: '#000'
-  }
+  };
+
+  protected border = {
+    defaultWidth: 1,
+    defaultColor: '#000',
+  };
 
   public clearFeild(ctx: CanvasRenderingContext2D | null, width: number, height: number): void {
     if (ctx) {
@@ -33,6 +38,7 @@ export class BaseShape {
       return;
     }
 
+    // draw shape shadow on hover
 		if (fill) {
 			ctx.fillStyle = elem.color || this.fillStyle;
 			ctx.closePath();
@@ -48,27 +54,36 @@ export class BaseShape {
 			ctx.fill();
 
 		} else {
-			ctx.strokeStyle = this.strokeStyle;
-			ctx.lineWidth = 1;
+			ctx.strokeStyle = this.border.defaultColor;
+			ctx.lineWidth = this.border.defaultWidth;
 			ctx.stroke();
 		}
+
+
+    // draw shape border
+    if (elem.border) {
+      ctx.strokeStyle = elem.border.color || this.border.defaultColor;
+			ctx.lineWidth = elem.border.width || this.border.defaultWidth;
+			ctx.stroke();
+    }
+
+    // draw text inside shape
     if (elem.text && elem.text.value) {
       const { value, fontWeight, fontSize, fontFamily, fontStyle, color, align } = elem.text;
       const { defaultColor, defaultFontFamily, defaultFontSize, defaultFontStyle, defaultFontWeight } = this.text;
 
-
       const font = (fontStyle || defaultFontStyle) + ' ' + (fontWeight || defaultFontWeight) + ' ' + (fontSize || defaultFontSize) + ' ' + (fontFamily || defaultFontFamily);
-      ctx.fillStyle = color || defaultColor;
       ctx.font = font
-
-
+      ctx.fillStyle = color || defaultColor;
       ctx.textBaseline = 'middle';
+
       let textX = elem.x + (elem.width / 2);
       let textY = elem.y + (elem.height / 2);
 
       if (!align || align === 'center') {
         ctx.textAlign = 'center';
       }
+
       if (align === 'left') {
         textX = elem.x;
       }

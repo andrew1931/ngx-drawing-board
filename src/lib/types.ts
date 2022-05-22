@@ -4,8 +4,9 @@ export interface ILayoutElement {
 	width: number,
 	height: number,
   shape: Shape,
-  color: string,
+  color?: string,
   text?: ILayoutElementText,
+  border?: ILayoutElementBorder,
 };
 
 export interface ILayoutElementText {
@@ -16,6 +17,11 @@ export interface ILayoutElementText {
   fontStyle?: string,
   fontSize?: string,
   align?: 'left' | 'center' | 'right',
+};
+
+export interface ILayoutElementBorder {
+  color?: string,
+  width?: number,
 };
 
 export interface IDrawElement {

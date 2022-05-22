@@ -79,6 +79,7 @@ Define options in your consuming component:
     shape: 'rectangle' | 'ellips',
     color?: string,
     text?: ILayoutElementText,
+    border?: ILayoutElementBorder,
   };
 
 
@@ -90,6 +91,11 @@ Define options in your consuming component:
     fontStyle?: string,
     fontSize?: string,
     align?: 'left' | 'center' | 'right',
+  };
+
+  interface ILayoutElementBorder {
+    color?: string,
+    width?: number,
   };
 ```
 
