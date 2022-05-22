@@ -3,23 +3,23 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ngx-canvas-drawer": {
+    "ngx-canvas-drawboard": {
       "projectType": "library",
-      "root": "projects/ngx-canvas-drawer",
-      "sourceRoot": "projects/ngx-canvas-drawer/src",
+      "root": "projects/ngx-canvas-drawboard",
+      "sourceRoot": "projects/ngx-canvas-drawboard/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "project": "projects/ngx-canvas-drawer/ng-package.json"
+            "project": "projects/ngx-canvas-drawboard/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/ngx-canvas-drawer/tsconfig.lib.prod.json"
+              "tsConfig": "projects/ngx-canvas-drawboard/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/ngx-canvas-drawer/tsconfig.lib.json"
+              "tsConfig": "projects/ngx-canvas-drawboard/tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -27,13 +27,13 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/ngx-canvas-drawer/src/test.ts",
-            "tsConfig": "projects/ngx-canvas-drawer/tsconfig.spec.json",
-            "karmaConfig": "projects/ngx-canvas-drawer/karma.conf.js"
+            "main": "projects/ngx-canvas-drawboard/src/test.ts",
+            "tsConfig": "projects/ngx-canvas-drawboard/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-canvas-drawboard/karma.conf.js"
           }
         }
       }
     }
   },
-  "defaultProject": "ngx-canvas-drawer"
+  "defaultProject": "ngx-canvas-drawboard"
 }

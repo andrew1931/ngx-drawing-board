@@ -1,4 +1,4 @@
-# ngx-canvas-drawer
+# ngx-canvas-drawboard
 
 Contents
 ========
@@ -9,19 +9,19 @@ Contents
 - [License](#license)
 
 ## Getting started
-### Step 1: Install `ngx-canvas-drawer`:
+### Step 1: Install `ngx-canvas-drawboard`:
 
 ```bash
-npm install ng2-canvas-drawer --save
+npm install ng2-canvas-drawboard --save
 ```
 
-### Step 2: Import NgxCanvasDrawerModule:
+### Step 2: Import NgxCanvasDrawboardModule:
 ```js
-import { NgxCanvasDrawerModule } from 'ngx-canvas-drawer';
+import { NgxCanvasDrawboardModule } from 'ngx-canvas-drawboard';
 
 @NgModule({
   ...
-  imports: [..., NgxCanvasDrawerModule],
+  imports: [..., NgxCanvasDrawboardModule],
   ...
 })
 export class SomeModule {}
@@ -30,13 +30,13 @@ export class SomeModule {}
 ## Usage
 Define options in your consuming component:
 ```html
-<ngx-canvas-drawer
+<ngx-canvas-drawboard
     [elements]="[]"
     [shape]="rectangle"
     [width]="1024"
     [height]="724"
   >
-  </ngx-canvas-drawer>
+  </ngx-canvas-drawboard>
 ```
 
 ## API
@@ -77,5 +77,5 @@ Define options in your consuming component:
 
 ## License
 
-The MIT License (see the [LICENSE](https://github.com/andrew1931/ngx-canvas-drawer/blob/main/LICENSE) file for the full
+The MIT License (see the [LICENSE](https://github.com/andrew1931/ngx-canvas-drawboard/blob/main/LICENSE) file for the full
 text)

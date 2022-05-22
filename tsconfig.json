@@ -12,9 +12,9 @@
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "paths": {
-      "ngx-canvas-drawer": [
-        "dist/ngx-canvas-drawer/ngx-canvas-drawer",
-        "dist/ngx-canvas-drawer"
+      "ngx-canvas-drawboard": [
+        "dist/ngx-canvas-drawboard/ngx-canvas-drawboard",
+        "dist/ngx-canvas-drawboard"
       ]
     },
     "declaration": false,

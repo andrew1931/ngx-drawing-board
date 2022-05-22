@@ -1,5 +1,5 @@
 {
-  "name": "ngx-canvas-drawer-workspace",
+  "name": "ngx-canvas-drawboard-workspace",
   "version": "0.1.0-rc",
   "scripts": {
     "ng": "ng",
