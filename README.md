@@ -34,7 +34,6 @@ export class SomeModule {}
 ```
 
 ## Usage
-Define options in your consuming component:
 ```html
 <ngx-canvas-drawboard
     [elements]="[]"
