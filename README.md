@@ -1,8 +1,8 @@
-<h1 align="center">ngx-canvas-drawboard</h1>
+<h1 align="center">ngx-drawing-board</h1>
 
 <p align="center">
   <br>
-  <i>The ngx-canvas-drawboard is a canvas area where you can draw, resize and drag shapes with a mouse.</i>
+  <i>The ngx-drawing-board is a canvas area where you can draw, resize and drag shapes with a mouse.</i>
   <br>
 </p>
 
@@ -15,19 +15,19 @@ Contents
 - [License](#license)
 
 ## Getting started
-### Step 1: Install `ngx-canvas-drawboard`:
+### Step 1: Install `ngx-drawing-board`:
 
 ```bash
-npm install ng2-canvas-drawboard --save
+npm install ngx-drawing-board --save
 ```
 
-### Step 2: Import NgxCanvasDrawboardModule:
-```js
-import { NgxCanvasDrawboardModule } from 'ngx-canvas-drawboard';
+### Step 2: Import NgxDrawingBoardModule:
+```ts
+import { NgxDrawingBoardModule } from 'ngx-drawing-board';
 
 @NgModule({
   ...
-  imports: [..., NgxCanvasDrawboardModule],
+  imports: [..., NgxDrawingBoardModule],
   ...
 })
 export class SomeModule {}
@@ -35,13 +35,13 @@ export class SomeModule {}
 
 ## Usage
 ```html
-<ngx-canvas-drawboard
+<ngx-drawing-board
     [elements]="[]"
-    [shape]="rectangle"
+    [shape]="'ellips'"
     [width]="1024"
     [height]="724"
   >
-  </ngx-canvas-drawboard>
+  </ngx-drawing-board>
 ```
 
 ## API
@@ -100,5 +100,5 @@ export class SomeModule {}
 
 ## License
 
-The MIT License (see the [LICENSE](https://github.com/andrew1931/ngx-canvas-drawboard/blob/main/LICENSE) file for the full
+The MIT License (see the [LICENSE](https://github.com/andrew1931/ngx-drawing-board/blob/main/LICENSE) file for the full
 text)

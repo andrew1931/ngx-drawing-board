@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "src",
   "projects": {
-    "ngx-canvas-drawboard": {
+    "ngx-drawing-board": {
       "projectType": "library",
       "root": "src",
       "sourceRoot": "src",
@@ -35,5 +35,5 @@
       }
     }
   },
-  "defaultProject": "ngx-canvas-drawboard"
+  "defaultProject": "ngx-drawing-board"
 }

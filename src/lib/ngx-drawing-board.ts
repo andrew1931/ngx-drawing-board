@@ -35,7 +35,7 @@ import {
 } from './utils';
 
 @Component({
-  selector: 'ngx-canvas-drawboard',
+  selector: 'ngx-drawing-board',
   template: `
     <canvas
       #canvas
@@ -46,7 +46,7 @@ import {
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NgxCanvasDrawboard implements OnInit, AfterViewInit, OnChanges, OnDestroy {
+export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDestroy {
 
   @Input() shape: Shape = 'rectangle';
   @Input() fitCanvasToImage: boolean = true;
