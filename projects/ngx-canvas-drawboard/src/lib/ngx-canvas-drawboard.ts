@@ -13,7 +13,13 @@ import {
   SimpleChanges,
   OnInit,
 } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import {
+  BehaviorSubject,
+  debounceTime,
+  fromEvent,
+  map,
+  Subscription
+} from 'rxjs';
 import { Rectangle, Elips } from './shapes';
 import { ILayoutElement, EMouseHandle, IPoint, Shape } from './types';
 import {
@@ -66,7 +72,7 @@ export class NgxCanvasDrawboard implements OnInit, AfterViewInit, OnChanges, OnD
 
   private canvas: HTMLCanvasElement;
 
-  private readonly minElementSize = 10;
+  private readonly minElementSize = 5;
 
   private newElement: ILayoutElement;
 
@@ -103,6 +109,8 @@ export class NgxCanvasDrawboard implements OnInit, AfterViewInit, OnChanges, OnD
     };
 	};
 
+  private subscriptions = new Subscription();
+
   constructor(
     private readonly zone: NgZone,
     private rectangle: Rectangle,
@@ -134,23 +142,51 @@ export class NgxCanvasDrawboard implements OnInit, AfterViewInit, OnChanges, OnD
 
     this.drawElemets();
 
-    this.zone.runOutsideAngular(() => {
-      this.canvas.addEventListener('mousedown', this.mouseDownListener);
-      this.canvas.addEventListener('mousemove', this.handleMouseMovement);
-      window.addEventListener('mousemove', this.mouseMoveListener);
-      window.addEventListener('mouseup', this.mouseUpListener);
-    });
+    this.initEventsSubscriptions();
   };
 
   /**
   * Remove event listeners
   */
   ngOnDestroy(): void {
-    this.canvas.removeEventListener('mousedown', this.mouseDownListener);
-    this.canvas.removeEventListener('mousemove', this.handleMouseMovement);
-    window.removeEventListener('mousemove', this.mouseMoveListener);
-    window.removeEventListener('mouseup', this.mouseUpListener);
+    this.subscriptions.unsubscribe();
   };
+
+  /**
+  * Init mousedown, mousemove, mousemove event listeners
+  */
+  private initEventsSubscriptions(): void {
+    const canvasMouseDown$ = fromEvent(this.canvas, 'mousedown');
+    const canvasMouseMove$ = fromEvent(this.canvas, 'mousemove');
+    const windowMouseMove$ = fromEvent(window, 'mousemove');
+    const windowMouseUp$ = fromEvent(window, 'mouseup');
+
+    this.zone.runOutsideAngular(() => {
+      this.subscriptions.add(
+        canvasMouseDown$.pipe(map((e: any) => e)).subscribe(this.mouseDownListener)
+      );
+
+      this.subscriptions.add(
+        windowMouseUp$.pipe(map((e: any) => e)).subscribe(this.mouseUpListener)
+      );
+
+      this.subscriptions.add(
+        canvasMouseMove$.pipe(
+          map((e: any) => e),
+          debounceTime(8)
+        )
+        .subscribe(this.handleMouseMovement)
+      );
+
+      this.subscriptions.add(
+        windowMouseMove$.pipe(
+          map((e: any) => e),
+          debounceTime(5)
+        )
+        .subscribe(this.mouseMoveListener)
+      );
+    });
+  }
 
   /**
   * Handle canvas mouse up
@@ -211,48 +247,50 @@ export class NgxCanvasDrawboard implements OnInit, AfterViewInit, OnChanges, OnD
   * @param mouseEvent
   */
 	mouseMoveListener = (e: MouseEvent): void => {
+    if (!this.mouseIsDown) {
+      return;
+	  }
+
     e.preventDefault();
     e.stopPropagation();
 
-		if (this.mouseIsDown) {
-			this.mouseCoords = ensureFieldBordersOnResize(
-        e.clientX - this.canvasX,
-        e.clientY - this.canvasY,
-        this.canvasWidth$.value,
-        this.canvasHeight$.value
-      );
+    this.mouseCoords = ensureFieldBordersOnResize(
+      e.clientX - this.canvasX,
+      e.clientY - this.canvasY,
+      this.canvasWidth$.value,
+      this.canvasHeight$.value
+    );
 
-			this.newElement.width = this.mouseCoords.x - this.newElement.x;
-			this.newElement.height = this.mouseCoords.y - this.newElement.y;
+    this.newElement.width = this.mouseCoords.x - this.newElement.x;
+    this.newElement.height = this.mouseCoords.y - this.newElement.y;
 
-			// resize existing element
-			if (this.resizableElementIndex >= 0) {
-				const targetEl = this.elements[this.resizableElementIndex];
-        let resizedEl = updateElementOnResize(this.currentHandle, this.mouseCoords, targetEl);
+    // resize existing element
+    if (this.resizableElementIndex >= 0) {
+      const targetEl = this.elements[this.resizableElementIndex];
+      let resizedEl = updateElementOnResize(this.currentHandle, this.mouseCoords, targetEl);
 
-				this.elements[this.resizableElementIndex] = resizedEl;
+      this.elements[this.resizableElementIndex] = resizedEl;
 
-				this.drawElemets();
-			}
-			// drag existing element
-			else if (this.dragableElementIndex >= 0) {
-				let targetEl = this.elements[this.dragableElementIndex];
-				targetEl.x += this.newElement.width;
-				targetEl.y += this.newElement.height;
+      this.drawElemets();
+    }
+    // drag existing element
+    else if (this.dragableElementIndex >= 0) {
+      let targetEl = this.elements[this.dragableElementIndex];
+      targetEl.x += this.newElement.width;
+      targetEl.y += this.newElement.height;
 
-				targetEl = ensureFieldBordersOnDrag(targetEl, this.canvasWidth$.value, this.canvasHeight$.value);
+      targetEl = ensureFieldBordersOnDrag(targetEl, this.canvasWidth$.value, this.canvasHeight$.value);
 
-				this.drawElemets();
+      this.drawElemets();
 
-				this.newElement.x = this.mouseCoords.x;
-				this.newElement.y = this.mouseCoords.y;
-			}
-			// draw new element
-			else {
-				this.drawElemets();
-        this.drawNewElement();
-			}
-	  }
+      this.newElement.x = this.mouseCoords.x;
+      this.newElement.y = this.mouseCoords.y;
+    }
+    // draw new element
+    else {
+      this.drawElemets();
+      this.drawNewElement();
+    }
 	};
 
   /**
