@@ -200,12 +200,16 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 		if (this.resizableElementIndex >= 0) {
 			let targeEl = this.elements[this.resizableElementIndex]
 			this.elements[this.resizableElementIndex] = convertElemntNegativeProps(targeEl);
-      this.onResizeEnd.emit();
+      this.zone.run(() => {
+        this.onResizeEnd.emit();
+      });
 		}
 
     // end of draging
     if (this.dragableElementIndex >= 0) {
-      this.onDragEnd.emit();
+      this.zone.run(() => {
+        this.onDragEnd.emit();
+      });
     }
 
     // end of drawing
@@ -213,7 +217,9 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 			const newElem = convertElemntNegativeProps({...this.newElement});
 			if (newElem.width > this.minElementSize && newElem.height > this.minElementSize) {
 				this.elements.push(newElem);
-        this.onAddElement.emit(newElem);
+        this.zone.run(() => {
+          this.onAddElement.emit(newElem);
+        });
         this.newElement = this.emptyElement;
         this.drawElemets();
 			}
@@ -233,10 +239,14 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 		this.mouseIsDown = true;
     if (this.dragableElementIndex >= 0) {
       this.selectedElementIndex = this.dragableElementIndex;
-      this.onFocusElement.emit(this.selectedElementIndex);
+      this.zone.run(() => {
+        this.onFocusElement.emit(this.selectedElementIndex);
+      });
     } else {
       this.selectedElementIndex = -1;
-      this.onBlurElement.emit(this.selectedElementIndex);
+      this.zone.run(() => {
+        this.onBlurElement.emit(this.selectedElementIndex);
+      });
     }
     this.drawElemets();
 	};
@@ -375,11 +385,15 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
     if (this.mouseEnterElementIndex < 0 && this.dragableElementIndex >= 0) {
       this.mouseEnterElementIndex = this.dragableElementIndex;
-      this.onMouseEnterElement.emit(this.mouseEnterElementIndex);
+      this.zone.run(() => {
+        this.onMouseEnterElement.emit(this.mouseEnterElementIndex);
+      });
     }
 
     if (this.mouseEnterElementIndex >= 0 && this.dragableElementIndex < 0) {
-      this.onMouseLeaveElement.emit(this.mouseEnterElementIndex);
+      this.zone.run(() => {
+        this.onMouseLeaveElement.emit(this.mouseEnterElementIndex);
+      });
       this.mouseEnterElementIndex = -1;
     }
 
