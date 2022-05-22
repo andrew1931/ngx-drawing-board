@@ -52,15 +52,15 @@ Define options in your consuming component:
 | fitCanvasToImage | boolean | true | no | makes canvas the same size as provided background image |
 
 ### Outputs
-| Output  | Description |
-| ------------- | ------------- |
-| (onAddElement)  | Fires when new element has been drawn on canvas |
-| (onFocusElement)  | Fires when element has been clicked |
-| (onBlurElement)  | Fires when selected element looses focus |
-| (onMouseEnterElement)  | Fires when mouse enteres element |
-| (onMouseLeaveElement)  | Fires when mouse leaves element |
-| (onResizeEnd)  | Fires when element's resizing is over |
-| (onDragEnd)  | Fires when element's draging is over |
+| Output  | Arguments | Description |
+| ------------- | ------------- | -------------
+| (onAddElement) | ILayoutElement | Fires when new element has been drawn on canvas |
+| (onFocusElement) | number (element index) |Fires when element has been clicked |
+| (onBlurElement) | number (element index) | Fires when selected element looses focus |
+| (onMouseEnterElement) | number (element index) | Fires when mouse enteres element |
+| (onMouseLeaveElement) | number (element index) | Fires when mouse leaves element |
+| (onResizeEnd) | void | Fires when element's resizing is over |
+| (onDragEnd) | void | Fires when element's draging is over |
 
 
 ## Interfaces
