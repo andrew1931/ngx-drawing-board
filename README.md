@@ -1,4 +1,10 @@
-# ngx-canvas-drawboard
+<h1 align="center">ngx-canvas-drawboard</h1>
+
+<p align="center">
+  <br>
+  <i>The ngx-canvas-drawboard is a canvas area where you can draw, resize and drag shapes with a mouse.</i>
+  <br>
+</p>
 
 Contents
 ========

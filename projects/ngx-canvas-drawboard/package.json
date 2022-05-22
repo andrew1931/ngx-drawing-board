@@ -4,7 +4,7 @@
   "keywords" :["angular","canvas", "drawing", "resizing", "drag & drop"],
   "license": "MIT",
   "author": "andrew1931",
-  "description": "Canvas whiteboard for Angular to draw, drag & drop and resize shapes",
+  "description": "Canvas drawing board for Angular to draw, drag & drop and resize shapes",
   "repository": {
     "type": "git",
     "url": "https://github.com/andrew1931/ngx-canvas-drawboard"
