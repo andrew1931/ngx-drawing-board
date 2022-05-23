@@ -59,7 +59,7 @@ export class SomeModule {}
 | Output  | Arguments | Description |
 | ------------- | ------------- | -------------
 | (onAddElement) | IElement | Fires when new element has been drawn on canvas |
-| (onClickElement) | number (element index) |Fires when element has been clicked |
+| (onClickElement) | {index: number, clickCoords: { x: number, y: number }} |Fires when element has been clicked |
 | (onFocusElement) | number (element index) |Fires when element gets focus |
 | (onBlurElement) | number (element index) | Fires when selected element looses focus |
 | (onMouseEnterElement) | number (element index) | Fires when mouse enteres element |

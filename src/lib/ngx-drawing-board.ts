@@ -40,8 +40,8 @@ import {
     <canvas
       #canvas
       [style.background]="canvasBackgound$ | async"
-	    [width]="canvasWidth$ | async"
-	    [height]="canvasHeight$ | async"
+      [width]="canvasWidth$ | async"
+      [height]="canvasHeight$ | async"
     ></canvas>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -57,7 +57,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() elements: IElement[] = [];
 
   @Output() onAddElement = new EventEmitter<IElement>();
-  @Output() onClickElement = new EventEmitter<number>();
+  @Output() onClickElement = new EventEmitter<{ index: number, clickCoords: IPoint }>();
   @Output() onFocusElement = new EventEmitter<number>();
   @Output() onBlurElement = new EventEmitter<number>();
   @Output() onMouseEnterElement = new EventEmitter<number>();
@@ -246,7 +246,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     if (this.dragableElementIndex >= 0) {
 
       this.zone.run(() => {
-        this.onClickElement.emit(this.dragableElementIndex);
+        this.onClickElement.emit({ index: this.dragableElementIndex, clickCoords: { x: e.clientX, y: e.clientY } });
       });
 
       if (this.selectedElementIndex !== this.dragableElementIndex) {
