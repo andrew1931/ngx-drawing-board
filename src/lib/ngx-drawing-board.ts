@@ -37,23 +37,18 @@ import {
 @Component({
   selector: 'ngx-drawing-board',
   template: `
-    <div
-      [style.position]="'relative'"
-      #canvasContainer
-    >
-      <canvas
-        #canvas
-        [style.background]="canvasBackgound$ | async"
-        [width]="canvasWidth$ | async"
-        [height]="canvasHeight$ | async"
-      ></canvas>
-    </div>
+    <canvas
+      #canvas
+      [style.background]="canvasBackgound$ | async"
+      [width]="canvasWidth$ | async"
+      [height]="canvasHeight$ | async"
+    ></canvas>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDestroy {
 
-  @Input() shape: Shape = 'ellips';
+  @Input() shape: Shape = 'rectangle';
   @Input() fitCanvasToImage: boolean = true;
   @Input() backgroundColor: string = '#f2f2f2';
   @Input() backgroundImage: string = '';
@@ -76,7 +71,6 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
 
   @ViewChild('canvas') canvasEl: ElementRef<HTMLCanvasElement>;
-  @ViewChild('canvasContainer') canvasContainer: ElementRef<HTMLDivElement>;
 
   public canvasWidth$: BehaviorSubject<number> = new BehaviorSubject(0);
   public canvasHeight$: BehaviorSubject<number> = new BehaviorSubject(0);
@@ -105,11 +99,11 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 	};
 
 	get canvasX(): number {
-		return this.canvasContainer?.nativeElement?.offsetLeft || 0;
+		return this.canvas?.getBoundingClientRect()?.left || 0;
 	};
 
 	get canvasY(): number {
-		return this.canvasContainer?.nativeElement?.offsetTop || 0;
+		return this.canvas?.getBoundingClientRect()?.top || 0;
 	};
 
 	get emptyElement(): IElement {
