@@ -4,7 +4,6 @@ export const HANDLE_SIZE = 5;
 
 export class BaseShape {
 
-  protected fillStyle = '#fff';
   protected handleFillStyle = '#000';
 
   protected shadow = {
@@ -40,7 +39,7 @@ export class BaseShape {
 
     // draw shape shadow on hover
 		if (fill) {
-			ctx.fillStyle = elem.color || this.fillStyle;
+			ctx.fillStyle = elem.color;
 			ctx.closePath();
 
 			if (isHovered) {

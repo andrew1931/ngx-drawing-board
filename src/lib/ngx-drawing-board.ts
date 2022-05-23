@@ -48,13 +48,14 @@ import {
 })
 export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDestroy {
 
+  @Input() elements: IElement[] = [];
   @Input() shape: Shape = 'rectangle';
-  @Input() fitCanvasToImage: boolean = true;
+  @Input() initialElementColor: string = '#ffffff';
   @Input() backgroundColor: string = '#f2f2f2';
   @Input() backgroundImage: string = '';
   @Input() width: number = 600;
   @Input() height: number = 600;
-  @Input() elements: IElement[] = [];
+  @Input() fitCanvasToImage: boolean = true;
 
   @Output() onAddElement = new EventEmitter<IElement>();
   @Output() onClickElement = new EventEmitter<{ index: number, clickCoords: IPoint }>();
@@ -113,6 +114,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
       width: 0,
       height: 0,
       shape: this.shape,
+      color: this.initialElementColor
     };
 	};
 
@@ -322,8 +324,15 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     }
     // drag existing element
     else if (this.dragableElementIndex >= 0) {
+      const { width, height } = this.newElement;
 
-      if (this.newElement.width <=2 && this.newElement.height <= 2) {
+      if (
+        (width === 0 && height === 0) ||
+        (width === -1 && height === 0) ||
+        (width === 1 && height === 0) ||
+        (width === 0 && height === -1) ||
+        (width === 0 && height === 1)
+      ) {
         return;
       }
 
@@ -339,8 +348,8 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
       }
 
       let targetEl = this.elements[this.dragableElementIndex];
-      targetEl.x += this.newElement.width;
-      targetEl.y += this.newElement.height;
+      targetEl.x += width;
+      targetEl.y += height;
 
       targetEl = ensureFieldBordersOnDrag(targetEl, this.canvasWidth$.value, this.canvasHeight$.value);
 

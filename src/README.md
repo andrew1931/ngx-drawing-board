@@ -53,6 +53,7 @@ export class SomeModule {}
 | shape | 'rectangle' \| 'ellips' | 'rectangle' | no | current drawing shape |
 | backgroundImage | string | '' | no | canvas background image |
 | backgroundColor | string | '#f2f2f2' | no | canvas background color |
+| initialElementColor | string | '#ffffff' | no | drawing element initial color |
 | fitCanvasToImage | boolean | true | no | makes canvas the same size as provided background image |
 
 ### Outputs
@@ -79,7 +80,7 @@ export class SomeModule {}
     width: number,
     height: number,
     shape: 'rectangle' | 'ellips',
-    color?: string,
+    color: string,
     text?: IElementText,
     border?: IElementBorder,
   };

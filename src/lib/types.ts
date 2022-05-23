@@ -4,7 +4,7 @@ export interface IElement {
 	width: number,
 	height: number,
   shape: Shape,
-  color?: string,
+  color: string,
   text?: IElementText,
   border?: IElementBorder,
 };
@@ -28,7 +28,7 @@ export interface IDrawElement {
 	ctx: CanvasRenderingContext2D | null,
 	elem: IElement,
 	fill?: boolean,
-	isHovered?: boolean
+	isHovered?: boolean,
 };
 
 export interface IDrawHandle {
