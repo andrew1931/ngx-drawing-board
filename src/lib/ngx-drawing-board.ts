@@ -67,9 +67,13 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   @Output() onBlurElement = new EventEmitter<number>();
   @Output() onMouseEnterElement = new EventEmitter<number>();
   @Output() onMouseLeaveElement = new EventEmitter<number>();
+  @Output() onResizeStart = new EventEmitter<void>();
+  @Output() onResizing = new EventEmitter<void>();
   @Output() onResizeEnd = new EventEmitter<void>();
   @Output() onDragStart = new EventEmitter<void>();
+  @Output() onDraging = new EventEmitter<void>();
   @Output() onDragEnd = new EventEmitter<void>();
+
 
   @ViewChild('canvas') canvasEl: ElementRef<HTMLCanvasElement>;
   @ViewChild('canvasContainer') canvasContainer: ElementRef<HTMLDivElement>;
@@ -91,6 +95,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   private mouseCoords: IPoint = { x: 0, y: 0 };
 	private mouseIsDown: boolean = false;
   private dragStarted: boolean = false;
+  private resizeStarted: boolean = false;
 	private shadowOnHoveredElement: boolean = false;
   private currentHandle: EMouseHandle | false = false;
 
@@ -211,6 +216,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 			this.elements[this.resizableElementIndex] = convertElemntNegativeProps(targeEl);
       this.zone.run(() => {
         this.onResizeEnd.emit();
+        this.resizeStarted = false;
       });
 		}
 
@@ -294,6 +300,16 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
     // resize existing element
     if (this.resizableElementIndex >= 0) {
+
+      if (!this.resizeStarted) {
+        this.onResizeStart.emit();
+        this.resizeStarted = true;
+      } else {
+        this.zone.run(() => {
+          this.onResizing.emit();
+        });
+      }
+
       const targetEl = this.elements[this.resizableElementIndex];
       let resizedEl = updateElementOnResize(this.currentHandle, this.mouseCoords, targetEl);
 
@@ -309,6 +325,10 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
           this.onDragStart.emit();
         });
         this.dragStarted = true;
+      } else {
+        this.zone.run(() => {
+          this.onDraging.emit();
+        });
       }
 
       let targetEl = this.elements[this.dragableElementIndex];
