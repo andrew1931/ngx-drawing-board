@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { EMouseHandle, IDrawElement, ILayoutElement, IPoint } from '../types';
+import { IDrawElement } from '../types';
 import { BaseShape } from './base';
 
 @Injectable()
@@ -13,5 +13,5 @@ export class Rectangle extends BaseShape {
     props.ctx.rect(props.elem.x, props.elem.y, props.elem.width, props.elem.height);
     super.drawElemet(props);
 	};
-  
+
 }

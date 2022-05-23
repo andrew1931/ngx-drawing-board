@@ -47,7 +47,7 @@ export class SomeModule {}
 ### Inputs
 | Input  | Type | Default | Required | Description |
 | ------------- | ------------- | ------------- | ------------- | ------------- |
-| elements | ILayoutElement | undefined | yes | List where all drawn elements are stored |
+| elements | IElement | undefined | yes | List where all drawn elements are stored |
 | width | number | 600 | no | width of canvas |
 | height | number | 600 | no | height of canvas |
 | shape | 'rectangle' \| 'ellips' | 'rectangle' | no | current drawing shape |
@@ -58,30 +58,30 @@ export class SomeModule {}
 ### Outputs
 | Output  | Arguments | Description |
 | ------------- | ------------- | -------------
-| (onAddElement) | ILayoutElement | Fires when new element has been drawn on canvas |
+| (onAddElement) | IElement | Fires when new element has been drawn on canvas |
 | (onClickElement) | number (element index) |Fires when element has been clicked |
 | (onFocusElement) | number (element index) |Fires when element gets focus |
 | (onBlurElement) | number (element index) | Fires when selected element looses focus |
 | (onMouseEnterElement) | number (element index) | Fires when mouse enteres element |
 | (onMouseLeaveElement) | number (element index) | Fires when mouse leaves element |
 | (onResizeEnd) | void | Fires when element's resizing is over |
+| (onDragStart) | void | Fires when element's draging has started |
 | (onDragEnd) | void | Fires when element's draging is over |
 
 ## Interfaces
 ```ts
-  interface ILayoutElement {
+  interface IElement {
     x: number,
     y: number,
     width: number,
     height: number,
     shape: 'rectangle' | 'ellips',
     color?: string,
-    text?: ILayoutElementText,
-    border?: ILayoutElementBorder,
+    text?: IElementText,
+    border?: IElementBorder,
   };
-
-
-  interface ILayoutElementText {
+  
+  interface IElementText {
     value: string,
     color?: string,
     fontWeight?: 100 | 200 | 300 | 400 | 500 | 600,
@@ -91,7 +91,7 @@ export class SomeModule {}
     align?: 'left' | 'center' | 'right',
   };
 
-  interface ILayoutElementBorder {
+  interface IElementBorder {
     color?: string,
     width?: number,
   };

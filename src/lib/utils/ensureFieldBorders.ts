@@ -1,4 +1,4 @@
-import { IPoint, ILayoutElement } from '../types';
+import { IPoint, IElement } from '../types';
 
 export const ensureFieldBordersOnResize = (mouseX: number, mouseY: number, fieldWidth: number, fieldHeight: number): IPoint => {
   if (mouseX > fieldWidth) { mouseX = fieldWidth; }
@@ -12,7 +12,7 @@ export const ensureFieldBordersOnResize = (mouseX: number, mouseY: number, field
   return { x: mouseX, y: mouseY };
 };
 
-export const ensureFieldBordersOnDrag = (elem: ILayoutElement, fieldWidth: number, fieldHeight: number): ILayoutElement => {
+export const ensureFieldBordersOnDrag = (elem: IElement, fieldWidth: number, fieldHeight: number): IElement => {
   if (elem.x + elem.width > fieldWidth) {
     elem.x = fieldWidth - elem.width;
   }

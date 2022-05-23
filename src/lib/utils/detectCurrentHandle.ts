@@ -1,11 +1,11 @@
 import { HANDLE_SIZE } from '../shapes/base';
-import { IPoint, ILayoutElement, EMouseHandle } from '../types';
+import { IPoint, IElement, EMouseHandle } from '../types';
 
 const dist = (p1: IPoint, p2: IPoint): number => {
   return Math.sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
 };
 
-export const detectCurrentHandle = (mouse: IPoint, elem: ILayoutElement): EMouseHandle | false => {
+export const detectCurrentHandle = (mouse: IPoint, elem: IElement): EMouseHandle | false => {
 
   const topLeft = dist(mouse, { x: elem.x, y: elem.y });
   if (topLeft <= HANDLE_SIZE) return EMouseHandle.topLeft;

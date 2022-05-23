@@ -21,7 +21,7 @@ import {
   Subscription
 } from 'rxjs';
 import { Rectangle, Ellips } from './shapes';
-import { ILayoutElement, EMouseHandle, IPoint, Shape } from './types';
+import { IElement, EMouseHandle, IPoint, Shape } from './types';
 import {
   convertElemntNegativeProps,
   ensureFieldBordersOnResize,
@@ -54,15 +54,16 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() backgroundImage: string = '';
   @Input() width: number = 600;
   @Input() height: number = 600;
-  @Input() elements: ILayoutElement[] = [];
+  @Input() elements: IElement[] = [];
 
-  @Output() onAddElement = new EventEmitter<ILayoutElement>();
+  @Output() onAddElement = new EventEmitter<IElement>();
   @Output() onClickElement = new EventEmitter<number>();
   @Output() onFocusElement = new EventEmitter<number>();
   @Output() onBlurElement = new EventEmitter<number>();
   @Output() onMouseEnterElement = new EventEmitter<number>();
   @Output() onMouseLeaveElement = new EventEmitter<number>();
   @Output() onResizeEnd = new EventEmitter<void>();
+  @Output() onDragStart = new EventEmitter<void>();
   @Output() onDragEnd = new EventEmitter<void>();
 
   @ViewChild('canvas') canvasEl: ElementRef<HTMLCanvasElement>;
@@ -75,7 +76,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
   private readonly minElementSize = 5;
 
-  private newElement: ILayoutElement;
+  private newElement: IElement;
 
   private mouseEnterElementIndex: number = -1;
 	private dragableElementIndex: number = -1;
@@ -83,6 +84,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   private selectedElementIndex: number = -1;
   private mouseCoords: IPoint = { x: 0, y: 0 };
 	private mouseIsDown: boolean = false;
+  private dragStarted: boolean = false;
 	private shadowOnHoveredElement: boolean = false;
   private currentHandle: EMouseHandle | false = false;
 
@@ -99,7 +101,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 		return this.canvas.offsetTop;
 	};
 
-	get emptyElement(): ILayoutElement {
+	get emptyElement(): IElement {
 		return {
       x: 0,
       y: 0,
@@ -209,7 +211,10 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     // end of draging
     if (this.dragableElementIndex >= 0) {
       this.zone.run(() => {
-        this.onDragEnd.emit();
+        if (this.dragStarted) {
+          this.onDragEnd.emit();
+          this.dragStarted = false;
+        }
       });
     }
 
@@ -292,6 +297,14 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     }
     // drag existing element
     else if (this.dragableElementIndex >= 0) {
+
+      if (!this.dragStarted) {
+        this.zone.run(() => {
+          this.onDragStart.emit();
+        });
+        this.dragStarted = true;
+      }
+
       let targetEl = this.elements[this.dragableElementIndex];
       targetEl.x += this.newElement.width;
       targetEl.y += this.newElement.height;

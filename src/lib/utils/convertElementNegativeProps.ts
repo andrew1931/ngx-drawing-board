@@ -1,6 +1,6 @@
-import { ILayoutElement } from '../types';
+import { IElement } from '../types';
 
-export const convertElemntNegativeProps = (elem: ILayoutElement): ILayoutElement => {
+export const convertElemntNegativeProps = (elem: IElement): IElement => {
   if (elem.width < 0) {
     elem.x = elem.x + elem.width;
     elem.width = (elem.width * -1);
@@ -10,6 +10,6 @@ export const convertElemntNegativeProps = (elem: ILayoutElement): ILayoutElement
     elem.y = elem.y + elem.height;
     elem.height = (elem.height * -1);
   }
-  
+
   return elem;
 };

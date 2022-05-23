@@ -1,7 +1,7 @@
-import { EMouseHandle, IPoint, ILayoutElement } from '../types';
+import { EMouseHandle, IPoint, IElement } from '../types';
 
 
-export const updateElementOnResize = (currentHandle: EMouseHandle | false, mouse: IPoint, elem: ILayoutElement): ILayoutElement => {
+export const updateElementOnResize = (currentHandle: EMouseHandle | false, mouse: IPoint, elem: IElement): IElement => {
   switch (currentHandle) {
     case EMouseHandle.topLeft:
       elem.width += elem.x - mouse.x;

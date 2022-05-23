@@ -1,4 +1,4 @@
-import { EMouseHandle, IDrawElement, IDrawHandle, ILayoutElement, IPoint } from '../types';
+import { EMouseHandle, IDrawElement, IDrawHandle, IElement, IPoint } from '../types';
 
 export const HANDLE_SIZE = 5;
 
@@ -112,7 +112,7 @@ export class BaseShape {
 		}
 	};
 
-  private getHandlePosition(currentHandle: EMouseHandle, elem: ILayoutElement): IPoint {
+  private getHandlePosition(currentHandle: EMouseHandle, elem: IElement): IPoint {
     const posHandle: IPoint = { x: 0, y: 0 };
     switch (currentHandle) {
       case EMouseHandle.topLeft:

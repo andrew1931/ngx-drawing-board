@@ -1,15 +1,15 @@
-export interface ILayoutElement {
+export interface IElement {
 	x: number,
 	y: number,
 	width: number,
 	height: number,
   shape: Shape,
   color?: string,
-  text?: ILayoutElementText,
-  border?: ILayoutElementBorder,
+  text?: IElementText,
+  border?: IElementBorder,
 };
 
-export interface ILayoutElementText {
+export interface IElementText {
   value: string,
   color?: string,
   fontWeight?: 100 | 200 | 300 | 400 | 500 | 600,
@@ -19,21 +19,21 @@ export interface ILayoutElementText {
   align?: 'left' | 'center' | 'right',
 };
 
-export interface ILayoutElementBorder {
+export interface IElementBorder {
   color?: string,
   width?: number,
 };
 
 export interface IDrawElement {
 	ctx: CanvasRenderingContext2D | null,
-	elem: ILayoutElement,
+	elem: IElement,
 	fill?: boolean,
 	isHovered?: boolean
 };
 
 export interface IDrawHandle {
 	ctx: CanvasRenderingContext2D | null,
-	elem: ILayoutElement,
+	elem: IElement,
 };
 
 export interface IPoint {
