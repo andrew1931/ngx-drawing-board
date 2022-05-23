@@ -251,15 +251,15 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 		this.mouseIsDown = true;
     if (this.dragableElementIndex >= 0) {
 
-      this.zone.run(() => {
-        this.onClickElement.emit({ index: this.dragableElementIndex, clickCoords: { x: e.clientX, y: e.clientY } });
-      });
-
       if (this.selectedElementIndex >= 0) {
         this.zone.run(() => {
           this.onBlurElement.emit(this.selectedElementIndex);
         });
       }
+
+      this.zone.run(() => {
+        this.onClickElement.emit({ index: this.dragableElementIndex, clickCoords: { x: e.clientX, y: e.clientY } });
+      });
 
       if (this.selectedElementIndex !== this.dragableElementIndex) {
         this.selectedElementIndex = this.dragableElementIndex;
@@ -322,6 +322,10 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     }
     // drag existing element
     else if (this.dragableElementIndex >= 0) {
+
+      if (this.newElement.width <=2 && this.newElement.height <= 2) {
+        return;
+      }
 
       if (!this.dragStarted) {
         this.zone.run(() => {
