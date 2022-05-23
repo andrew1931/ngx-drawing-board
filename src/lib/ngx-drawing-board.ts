@@ -62,12 +62,12 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   @Output() onBlurElement = new EventEmitter<number>();
   @Output() onMouseEnterElement = new EventEmitter<number>();
   @Output() onMouseLeaveElement = new EventEmitter<number>();
-  @Output() onResizeStart = new EventEmitter<void>();
-  @Output() onResizing = new EventEmitter<void>();
-  @Output() onResizeEnd = new EventEmitter<void>();
-  @Output() onDragStart = new EventEmitter<void>();
-  @Output() onDraging = new EventEmitter<void>();
-  @Output() onDragEnd = new EventEmitter<void>();
+  @Output() onResizeStart = new EventEmitter<number>();
+  @Output() onResizing = new EventEmitter<number>();
+  @Output() onResizeEnd = new EventEmitter<number>();
+  @Output() onDragStart = new EventEmitter<number>();
+  @Output() onDraging = new EventEmitter<number>();
+  @Output() onDragEnd = new EventEmitter<number>();
 
 
   @ViewChild('canvas') canvasEl: ElementRef<HTMLCanvasElement>;
@@ -209,7 +209,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 			let targeEl = this.elements[this.resizableElementIndex]
 			this.elements[this.resizableElementIndex] = convertElemntNegativeProps(targeEl);
       this.zone.run(() => {
-        this.onResizeEnd.emit();
+        this.onResizeEnd.emit(this.resizableElementIndex);
         this.resizeStarted = false;
       });
 		}
@@ -218,7 +218,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     if (this.dragableElementIndex >= 0) {
       this.zone.run(() => {
         if (this.dragStarted) {
-          this.onDragEnd.emit();
+          this.onDragEnd.emit(this.dragableElementIndex);
           this.dragStarted = false;
         }
       });
@@ -255,6 +255,12 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
         this.onClickElement.emit({ index: this.dragableElementIndex, clickCoords: { x: e.clientX, y: e.clientY } });
       });
 
+      if (this.selectedElementIndex >= 0) {
+        this.zone.run(() => {
+          this.onBlurElement.emit(this.selectedElementIndex);
+        });
+      }
+
       if (this.selectedElementIndex !== this.dragableElementIndex) {
         this.selectedElementIndex = this.dragableElementIndex;
         this.zone.run(() => {
@@ -262,10 +268,13 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
         });
       }
     } else {
+      if (this.selectedElementIndex >= 0) {
+        this.zone.run(() => {
+          this.onBlurElement.emit(this.selectedElementIndex);
+        });
+      }
+
       this.selectedElementIndex = -1;
-      this.zone.run(() => {
-        this.onBlurElement.emit(this.selectedElementIndex);
-      });
     }
     this.drawElemets();
 	};
@@ -296,11 +305,11 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     if (this.resizableElementIndex >= 0) {
 
       if (!this.resizeStarted) {
-        this.onResizeStart.emit();
+        this.onResizeStart.emit(this.resizableElementIndex);
         this.resizeStarted = true;
       } else {
         this.zone.run(() => {
-          this.onResizing.emit();
+          this.onResizing.emit(this.resizableElementIndex);
         });
       }
 
@@ -316,12 +325,12 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
       if (!this.dragStarted) {
         this.zone.run(() => {
-          this.onDragStart.emit();
+          this.onDragStart.emit(this.dragableElementIndex);
         });
         this.dragStarted = true;
       } else {
         this.zone.run(() => {
-          this.onDraging.emit();
+          this.onDraging.emit(this.dragableElementIndex);
         });
       }
 

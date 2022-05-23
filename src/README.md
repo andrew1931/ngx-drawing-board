@@ -64,12 +64,12 @@ export class SomeModule {}
 | (onBlurElement) | number (element index) | Fires when selected element looses focus |
 | (onMouseEnterElement) | number (element index) | Fires when mouse enteres element |
 | (onMouseLeaveElement) | number (element index) | Fires when mouse leaves element |
-| (onResizeStart) | void | Fires when element's resizing has started |
-| (onResizing) | void | Fires when element is being resized |
-| (onResizeEnd) | void | Fires when element's resizing is over |
-| (onDragStart) | void | Fires when element's draging has started |
-| (onDraging) | void | Fires when element is being draged |
-| (onDragEnd) | void | Fires when element's draging is over |
+| (onResizeStart) | number (element index) | Fires when element's resizing has started |
+| (onResizing) | number (element index) | Fires when element is being resized |
+| (onResizeEnd) | number (element index) | Fires when element's resizing is over |
+| (onDragStart) | number (element index) | Fires when element's draging has started |
+| (onDraging) | number (element index) | Fires when element is being draged |
+| (onDragEnd) | number (element index) | Fires when element's draging is over |
 
 ## Interfaces
 ```ts
