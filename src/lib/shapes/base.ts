@@ -4,7 +4,7 @@ export const HANDLE_SIZE = 5;
 
 export class BaseShape {
 
-  protected handleFillStyle = '#000';
+  protected handleFillStyle = '#00B100';
 
   protected shadow = {
     color: '#ccc',
@@ -102,52 +102,46 @@ export class BaseShape {
     }
 		for (const handleType of Object.values(EMouseHandle)) {
 			const handle = this.getHandlePosition(handleType, elem);
-			ctx.fillStyle = this.handleFillStyle;
-			ctx.globalCompositeOperation = 'xor';
-			ctx.beginPath();
-			ctx.arc(handle.x, handle.y, HANDLE_SIZE, 0, 2 * Math.PI);
-			ctx.fill();
-			ctx.globalCompositeOperation = 'source-over';
+      if (handle) {
+        ctx.fillStyle = this.handleFillStyle;
+        ctx.globalCompositeOperation = 'xor';
+        ctx.beginPath();
+        ctx.arc(handle.x, handle.y, HANDLE_SIZE, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+      }
 		}
 	};
 
-  private getHandlePosition(currentHandle: EMouseHandle, elem: IElement): IPoint {
-    const posHandle: IPoint = { x: 0, y: 0 };
+  private getHandlePosition(currentHandle: EMouseHandle, elem: IElement): IPoint | null {
+    let handlePosition: IPoint | null = null;
     switch (currentHandle) {
       case EMouseHandle.topLeft:
-        posHandle.x = elem.x;
-        posHandle.y = elem.y;
+        handlePosition = { x: elem.x, y: elem.y };
         break;
       case EMouseHandle.topRight:
-        posHandle.x = elem.x + elem.width;
-        posHandle.y = elem.y;
+        handlePosition = { x: elem.x + elem.width, y: elem.y };
         break;
       case EMouseHandle.bottomLeft:
-        posHandle.x = elem.x;
-        posHandle.y = elem.y + elem.height;
+        handlePosition = { x: elem.x, y: elem.y + elem.height };
         break;
       case EMouseHandle.bottomRight:
-        posHandle.x = elem.x + elem.width;
-        posHandle.y = elem.y + elem.height;
+        handlePosition = { x: elem.x + elem.width, y: elem.y + elem.height };
         break;
       case EMouseHandle.top:
-        posHandle.x = elem.x + elem.width / 2;
-        posHandle.y = elem.y;
+        handlePosition = { x: elem.x + elem.width / 2, y: elem.y };
         break;
       case EMouseHandle.left:
-        posHandle.x = elem.x;
-        posHandle.y = elem.y + elem.height / 2;
+        handlePosition = { x: elem.x, y: elem.y + elem.height / 2 };
         break;
       case EMouseHandle.bottom:
-        posHandle.x = elem.x + elem.width / 2;
-        posHandle.y = elem.y + elem.height;
+        handlePosition = { x: elem.x + elem.width / 2, y: elem.y + elem.height };
         break;
       case EMouseHandle.right:
-        posHandle.x = elem.x + elem.width;
-        posHandle.y = elem.y + elem.height / 2;
+        handlePosition = { x: elem.x + elem.width, y: elem.y + elem.height / 2 };
         break;
       }
-    return posHandle;
+    return handlePosition;
   };
 
 }

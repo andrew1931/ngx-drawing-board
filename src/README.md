@@ -50,10 +50,10 @@ export class SomeModule {}
 | elements | IElement | undefined | yes | List where all drawn elements are stored |
 | width | number | 600 | no | width of canvas |
 | height | number | 600 | no | height of canvas |
-| shape | 'rectangle' \| 'ellips' | 'rectangle' | no | current drawing shape |
-| backgroundImage | string | '' | no | canvas background image |
-| backgroundColor | string | '#f2f2f2' | no | canvas background color |
-| initialElementColor | string | '#ffffff' | no | drawing element initial color |
+| shape | Shape | "rectangle" | no | current drawing shape |
+| backgroundImage | string | "" | no | canvas background image |
+| backgroundColor | string | "#f2f2f2" | no | canvas background color |
+| initialElementColor | string | "#ffffff" | no | drawing element initial color |
 | fitCanvasToImage | boolean | true | no | makes canvas the same size as provided background image |
 
 ### Outputs
@@ -72,7 +72,7 @@ export class SomeModule {}
 | (onDraging) | number (element index) | Fires when element is being draged |
 | (onDragEnd) | number (element index) | Fires when element's draging is over |
 
-## Interfaces
+## Types
 ```ts
   interface IElement {
     x: number,
@@ -99,6 +99,10 @@ export class SomeModule {}
     color?: string,
     width?: number,
   };
+
+  type Shape = 'rectangle' | 'ellips' | 'triangle';
+
+
 ```
 
 ## License

@@ -50,6 +50,7 @@ export enum EMouseHandle {
 	left = 'left',
 	bottom = 'bottom',
 	right = 'right',
+  center = 'center',
 };
 
-export type Shape = 'rectangle' | 'ellips';
+export type Shape = 'rectangle' | 'ellips' | 'triangle';

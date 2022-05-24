@@ -20,8 +20,8 @@ import {
   map,
   Subscription
 } from 'rxjs';
-import { Rectangle, Ellips } from './shapes';
-import { IElement, EMouseHandle, IPoint, Shape } from './types';
+import { Rectangle, Ellips, Triangle } from './shapes';
+import { IElement, EMouseHandle, IPoint, Shape, IDrawElement } from './types';
 import {
   convertElemntNegativeProps,
   ensureFieldBordersOnResize,
@@ -31,7 +31,8 @@ import {
   isCircle,
   detectIfMouseIsOverElement,
   detectCurrentHandle,
-  setCursorType
+  setCursorType,
+  isTriangle
 } from './utils';
 
 @Component({
@@ -123,7 +124,8 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   constructor(
     private readonly zone: NgZone,
     private rectangle: Rectangle,
-    private ellips: Ellips
+    private ellips: Ellips,
+    private triangle: Triangle
   ) {}
 
   /**
@@ -235,9 +237,9 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
           this.onAddElement.emit(newElem);
         });
         this.newElement = this.emptyElement;
-        this.drawElemets();
 			}
 		}
+    this.drawElemets();
 	};
 
   /**
@@ -379,13 +381,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
         isHovered: this.dragableElementIndex === index
       };
 
-      if (isRectangle(elem)) {
-        this.rectangle.drawElemet(drawProps);
-      }
-
-      if (isCircle(elem)) {
-        this.ellips.drawElemet(drawProps);
-      }
+      this.drawNewElement(drawProps);
 
       if (index === this.selectedElementIndex) {
         this.rectangle.drawHandles({ ctx: this.ctx, elem });
@@ -396,19 +392,26 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   /**
   * Draw new element
   */
-  drawNewElement = (): void => {
-    const drawProps = {
+  drawNewElement = (props?: IDrawElement): void => {
+    const _props = {
       ctx: this.ctx,
       elem: this.newElement,
     };
 
-    if (isRectangle(this.newElement)) {
+    const drawProps = props || _props;
+
+    if (isRectangle(drawProps.elem)) {
       this.rectangle.drawElemet(drawProps);
     }
 
-    if (isCircle(this.newElement)) {
+    if (isCircle(drawProps.elem)) {
       this.ellips.drawElemet(drawProps);
     }
+
+    if (isTriangle(drawProps.elem)) {
+      this.triangle.drawElemet(drawProps);
+    }
+
   };
 
   /**
@@ -433,7 +436,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
       mouseIsOverElement = detectIfMouseIsOverElement(currentX, currentY, elem);
       this.currentHandle = detectCurrentHandle({ x: currentX, y: currentY }, elem);
       if (this.currentHandle) {
-				this.resizableElementIndex = index;
+        this.resizableElementIndex = index;
         this.dragableElementIndex = -1;
 				break;
 			}
