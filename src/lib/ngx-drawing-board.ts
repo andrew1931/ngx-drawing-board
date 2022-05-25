@@ -304,12 +304,9 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     e.preventDefault();
     e.stopPropagation();
 
-    this.mouseCoords = ensureFieldBordersOnResize(
-      e.clientX - this.canvasX,
-      e.clientY - this.canvasY,
-      this.canvasWidth$.value,
-      this.canvasHeight$.value
-    );
+    this.mouseCoords = this.getMouseCoords(e);
+
+    ensureFieldBordersOnResize(this.mouseCoords, this.canvasWidth$.value, this.canvasHeight$.value);
 
     this.newElement.width = this.mouseCoords.x - this.newElement.x;
     this.newElement.height = this.mouseCoords.y - this.newElement.y;
@@ -327,9 +324,8 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
       }
 
       const targetEl = this.elements[this.resizableElementIndex];
-      let resizedEl = updateElementOnResize(this.currentHandle, this.mouseCoords, targetEl);
 
-      this.elements[this.resizableElementIndex] = resizedEl;
+      this.elements[this.resizableElementIndex] = updateElementOnResize(this.currentHandle, this.mouseCoords, targetEl);
 
       this.drawElements();
     }
@@ -358,11 +354,11 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
         });
       }
 
-      let targetEl = this.elements[this.draggableElementIndex];
+      const targetEl = this.elements[this.draggableElementIndex];
       targetEl.x += width;
       targetEl.y += height;
 
-      targetEl = ensureFieldBordersOnDrag(targetEl, this.canvasWidth$.value, this.canvasHeight$.value);
+      ensureFieldBordersOnDrag(targetEl, this.canvasWidth$.value, this.canvasHeight$.value);
 
       this.drawElements();
 
@@ -435,15 +431,14 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     this.draggableElementIndex = -1;
 		this.resizableElementIndex = -1;
 
-		const currentX = e.clientX - this.canvasX;
-		const currentY = e.clientY - this.canvasY;
+		const mouseCoords = this.getMouseCoords(e);
 
 		for (let [index, elem] of this.elements.entries()) {
 
       let mouseIsOverElement = false;
 
-      mouseIsOverElement = detectIfMouseIsOverElement(currentX, currentY, elem);
-      this.currentHandle = detectCurrentHandle({ x: currentX, y: currentY }, elem);
+      mouseIsOverElement = detectIfMouseIsOverElement(mouseCoords, elem);
+      this.currentHandle = detectCurrentHandle(mouseCoords, elem);
       if (this.currentHandle) {
         this.resizableElementIndex = index;
         this.draggableElementIndex = -1;
@@ -501,7 +496,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     } else {
       this.canvasBackground$.next(this.backgroundColor);
     }
-  }
+  };
 
   /**
   * Returns params for output event
@@ -512,6 +507,16 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
       index: targetIndex,
       element: this.elements[targetIndex]
     }
-  }
+  };
+
+  /**
+   * Returns coordinates of a mouse
+   */
+  getMouseCoords(e: MouseEvent): IPoint {
+    return {
+      x: e.clientX - this.canvasX,
+      y: e.clientY - this.canvasY
+    }
+  };
 
 }

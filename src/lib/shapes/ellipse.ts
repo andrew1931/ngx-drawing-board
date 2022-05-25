@@ -13,11 +13,11 @@ export class Ellipse extends BaseShape {
     const { x, y, width, height } = props.elem;
     const mouseX = width + x;
     const mouseY = height + y;
-
     const scaleX = ((mouseX - x) / 2);
     const scaleY = ((mouseY - y) / 2);
     const centerX = (x / scaleX) + 1;
     const centerY = (y / scaleY) + 1;
+
     props.ctx.save();
 		props.ctx.beginPath();
     props.ctx.scale(scaleX ,scaleY);

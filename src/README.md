@@ -35,8 +35,8 @@ export class SomeModule {}
 ## Usage
 ```html
   <ngx-drawing-board
-    [elements]="[]"
-    [shape]="'ellips'"
+    [data]="[]"
+    [shape]="'ellipse'"
     [width]="1024"
     [height]="724"
   >
@@ -48,13 +48,13 @@ export class SomeModule {}
 | Input               | Type     | Default      | Required | Description                                             |
 |---------------------|----------|--------------|----------|---------------------------------------------------------|
 | data                | IElement | []           | no       | List where all drawn elements are stored                |
-| width               | number   | 600          | no       | width of canvas                                         |
-| height              | number   | 600          | no       | height of canvas                                        |
-| shape               | Shape    | "rectangle"  | no       | current drawing shape                                   |
-| backgroundImage     | string   | ""           | no       | canvas background image                                 |
-| backgroundColor     | string   | "#f2f2f2"    | no       | canvas background color                                 |
-| initialElementColor | string   | "#ffffff"    | no       | drawing element initial color                           |
-| fitCanvasToImage    | boolean  | true         | no       | makes canvas the same size as provided background image |
+| width               | number   | 600          | no       | Width of canvas                                         |
+| height              | number   | 600          | no       | Height of canvas                                        |
+| shape               | Shape    | "rectangle"  | no       | Current drawing shape                                   |
+| backgroundImage     | string   | ""           | no       | Canvas background image                                 |
+| backgroundColor     | string   | "#f2f2f2"    | no       | Canvas background color                                 |
+| initialElementColor | string   | "#ffffff"    | no       | Drawing element initial color                           |
+| fitCanvasToImage    | boolean  | true         | no       | Makes canvas the same size as provided background image |
 
 ### Outputs
 | Output                | Arguments         | Description                                     |
@@ -79,11 +79,11 @@ export class SomeModule {}
     y: number,
     width: number,
     height: number,
-    shape: 'rectangle' | 'ellips',
+    shape: Shape,
     color: string,
     text?: IElementText,
     border?: IElementBorder,
-  };
+  }
   
   interface IElementText {
     value: string,
@@ -93,12 +93,12 @@ export class SomeModule {}
     fontStyle?: string,
     fontSize?: string,
     align?: 'left' | 'center' | 'right',
-  };
+  }
 
   interface IElementBorder {
     color?: string,
     width?: number,
-  };
+  }
 
   interface IOutputEvent {
     index: number,

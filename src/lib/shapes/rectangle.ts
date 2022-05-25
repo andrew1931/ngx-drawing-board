@@ -9,8 +9,10 @@ export class Rectangle extends BaseShape {
     if (props.ctx === null) {
       return;
     }
+
     props.ctx.beginPath();
     props.ctx.rect(props.elem.x, props.elem.y, props.elem.width, props.elem.height);
+
     super.drawElement(props);
 	};
 

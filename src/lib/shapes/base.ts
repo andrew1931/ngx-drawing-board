@@ -58,7 +58,6 @@ export class BaseShape {
 			ctx.stroke();
 		}
 
-
     // draw shape border
     if (elem.border && elem.border.color) {
       ctx.strokeStyle = elem.border.color;
