@@ -54,3 +54,12 @@ export enum EMouseHandle {
 }
 
 export type Shape = 'rectangle' | 'ellipse' | 'triangle';
+
+export interface IOutputEvent {
+  index: number,
+  element: IElement
+}
+
+export interface IOutputClickEvent extends IOutputEvent {
+  clickCoords: IPoint
+}

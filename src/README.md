@@ -45,32 +45,32 @@ export class SomeModule {}
 
 ## API
 ### Inputs
-| Input  | Type | Default | Required | Description |
-| ------------- | ------------- | ------------- | ------------- | ------------- |
-| elements | IElement | undefined | yes | List where all drawn elements are stored |
-| width | number | 600 | no | width of canvas |
-| height | number | 600 | no | height of canvas |
-| shape | Shape | "rectangle" | no | current drawing shape |
-| backgroundImage | string | "" | no | canvas background image |
-| backgroundColor | string | "#f2f2f2" | no | canvas background color |
-| initialElementColor | string | "#ffffff" | no | drawing element initial color |
-| fitCanvasToImage | boolean | true | no | makes canvas the same size as provided background image |
+| Input               | Type     | Default      | Required | Description                                             |
+|---------------------|----------|--------------|----------|---------------------------------------------------------|
+| data                | IElement | []           | no       | List where all drawn elements are stored                |
+| width               | number   | 600          | no       | width of canvas                                         |
+| height              | number   | 600          | no       | height of canvas                                        |
+| shape               | Shape    | "rectangle"  | no       | current drawing shape                                   |
+| backgroundImage     | string   | ""           | no       | canvas background image                                 |
+| backgroundColor     | string   | "#f2f2f2"    | no       | canvas background color                                 |
+| initialElementColor | string   | "#ffffff"    | no       | drawing element initial color                           |
+| fitCanvasToImage    | boolean  | true         | no       | makes canvas the same size as provided background image |
 
 ### Outputs
-| Output  | Arguments | Description                                     |
-| ------------- | ------------- |-------------------------------------------------
-| (onAddElement) | IElement | Fires when new element has been drawn on canvas |
-| (onClickElement) | {index: number, clickCoords: { x: number, y: number }} | Fires when element has been clicked             |
-| (onFocusElement) | number (element index) | Fires when element gets focus                   |
-| (onBlurElement) | number (element index) | Fires when selected element looses focus        |
-| (onMouseEnterElement) | number (element index) | Fires when mouse enteres element                |
-| (onMouseLeaveElement) | number (element index) | Fires when mouse leaves element                 |
-| (onResizeStart) | number (element index) | Fires when element's resizing has started       |
-| (onResizing) | number (element index) | Fires when element is being resized             |
-| (onResizeEnd) | number (element index) | Fires when element's resizing is over           |
-| (onDragStart) | number (element index) | Fires when element's dragging has started       |
-| (onDragging) | number (element index) | Fires when element is being draged              |
-| (onDragEnd) | number (element index) | Fires when element's dragging is over           |
+| Output                | Arguments         | Description                                     |
+|-----------------------|-------------------|-------------------------------------------------|
+| (onAddElement)        | IOutputEvent      | Fires when new element has been drawn on canvas |
+| (onClickElement)      | IOutputClickEvent | Fires when element has been clicked             |
+| (onFocusElement)      | IOutputEvent      | Fires when element gets focus                   |
+| (onBlurElement)       | IOutputEvent      | Fires when selected element looses focus        |
+| (onMouseEnterElement) | IOutputEvent      | Fires when mouse enteres element                |
+| (onMouseLeaveElement) | IOutputEvent      | Fires when mouse leaves element                 |
+| (onResizeStart)       | IOutputEvent      | Fires when element's resizing has started       |
+| (onResizing)          | IOutputEvent      | Fires when element is being resized             |
+| (onResizeEnd)         | IOutputEvent      | Fires when element's resizing is over           |
+| (onDragStart)         | IOutputEvent      | Fires when element's dragging has started       |
+| (onDragging)          | IOutputEvent      | Fires when element is being draged              |
+| (onDragEnd)           | IOutputEvent      | Fires when element's dragging is over           |
 
 ## Types
 ```ts
@@ -99,6 +99,17 @@ export class SomeModule {}
     color?: string,
     width?: number,
   };
+
+  interface IOutputEvent {
+    index: number,
+    element: IElement
+  }
+
+  interface IOutputClickEvent {
+    index: number,
+    element: IElement
+    clickCoords: IPoint
+  }
 
   type Shape = 'rectangle' | 'ellipse' | 'triangle';
 

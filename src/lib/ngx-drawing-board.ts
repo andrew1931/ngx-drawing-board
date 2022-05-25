@@ -21,7 +21,7 @@ import {
   Subscription
 } from 'rxjs';
 import { Rectangle, Ellipse, Triangle } from './shapes';
-import { IElement, EMouseHandle, IPoint, Shape, IDrawElement } from './types';
+import { IElement, EMouseHandle, IPoint, Shape, IDrawElement, IOutputEvent, IOutputClickEvent } from './types';
 import {
   convertElementNegativeProps,
   ensureFieldBordersOnResize,
@@ -49,7 +49,7 @@ import {
 })
 export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDestroy {
 
-  @Input() elements: IElement[] = [];
+  @Input() data: IElement[] = [];
   @Input() shape: Shape = 'rectangle';
   @Input() initialElementColor: string = '#ffffff';
   @Input() backgroundColor: string = '#f2f2f2';
@@ -58,18 +58,18 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() height: number = 600;
   @Input() fitCanvasToImage: boolean = true;
 
-  @Output() onAddElement = new EventEmitter<IElement>();
-  @Output() onClickElement = new EventEmitter<{ index: number, clickCoords: IPoint }>();
-  @Output() onFocusElement = new EventEmitter<number>();
-  @Output() onBlurElement = new EventEmitter<number>();
-  @Output() onMouseEnterElement = new EventEmitter<number>();
-  @Output() onMouseLeaveElement = new EventEmitter<number>();
-  @Output() onResizeStart = new EventEmitter<number>();
-  @Output() onResizing = new EventEmitter<number>();
-  @Output() onResizeEnd = new EventEmitter<number>();
-  @Output() onDragStart = new EventEmitter<number>();
-  @Output() onDragging = new EventEmitter<number>();
-  @Output() onDragEnd = new EventEmitter<number>();
+  @Output() onAddElement = new EventEmitter<IOutputEvent>();
+  @Output() onClickElement = new EventEmitter<IOutputClickEvent>();
+  @Output() onFocusElement = new EventEmitter<IOutputEvent>();
+  @Output() onBlurElement = new EventEmitter<IOutputEvent>();
+  @Output() onMouseEnterElement = new EventEmitter<IOutputEvent>();
+  @Output() onMouseLeaveElement = new EventEmitter<IOutputEvent>();
+  @Output() onResizeStart = new EventEmitter<IOutputEvent>();
+  @Output() onResizing = new EventEmitter<IOutputEvent>();
+  @Output() onResizeEnd = new EventEmitter<IOutputEvent>();
+  @Output() onDragStart = new EventEmitter<IOutputEvent>();
+  @Output() onDragging = new EventEmitter<IOutputEvent>();
+  @Output() onDragEnd = new EventEmitter<IOutputEvent>();
 
 
   @ViewChild('canvas') canvasEl: ElementRef<HTMLCanvasElement> | undefined;
@@ -83,9 +83,10 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   private readonly minElementSize = 5;
 
   private newElement: IElement = this.emptyElement;
+  private elements: IElement[] = [];
 
   private mouseEnterElementIndex: number = -1;
-	private dragableElementIndex: number = -1;
+	private draggableElementIndex: number = -1;
 	private resizableElementIndex: number = -1;
   private selectedElementIndex: number = -1;
   private mouseCoords: IPoint = { x: 0, y: 0 };
@@ -132,7 +133,8 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   * Re-draw all elements when `this.elements` list changes
   */
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.elements && this.canvas) {
+    if (this.canvas && changes.data) {
+      this.elements = [...changes.data.currentValue];
       this.drawElements();
     }
   };
@@ -141,6 +143,9 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   * Init canvas size and background
   */
   ngOnInit(): void {
+    if (this.data) {
+      this.elements = [...this.data];
+    }
     this.setCanvasSizeAndBackground();
   };
 
@@ -214,28 +219,28 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 			let targetEl = this.elements[this.resizableElementIndex]
 			this.elements[this.resizableElementIndex] = convertElementNegativeProps(targetEl);
       this.zone.run(() => {
-        this.onResizeEnd.emit(this.resizableElementIndex);
+        this.onResizeEnd.emit(this.getOutputParams(this.resizableElementIndex));
         this.resizeStarted = false;
       });
 		}
 
     // end of dragging
-    if (this.dragableElementIndex >= 0) {
+    if (this.draggableElementIndex >= 0) {
       this.zone.run(() => {
         if (this.dragStarted) {
-          this.onDragEnd.emit(this.dragableElementIndex);
+          this.onDragEnd.emit(this.getOutputParams(this.draggableElementIndex));
           this.dragStarted = false;
         }
       });
     }
 
     // end of drawing
-		if (this.dragableElementIndex < 0 && this.resizableElementIndex < 0) {
+		if (this.draggableElementIndex < 0 && this.resizableElementIndex < 0) {
 			const newElem = convertElementNegativeProps({ ...this.newElement });
 			if (newElem.width > this.minElementSize && newElem.height > this.minElementSize) {
 				this.elements.push(newElem);
         this.zone.run(() => {
-          this.onAddElement.emit(newElem);
+          this.onAddElement.emit(this.getOutputParams(this.elements.length - 1));
         });
         this.newElement = this.emptyElement;
 			}
@@ -254,28 +259,31 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 		this.newElement.x = e.clientX - this.canvasX;
 		this.newElement.y = e.clientY - this.canvasY;
 		this.mouseIsDown = true;
-    if (this.dragableElementIndex >= 0) {
+    if (this.draggableElementIndex >= 0) {
 
       if (this.selectedElementIndex >= 0) {
         this.zone.run(() => {
-          this.onBlurElement.emit(this.selectedElementIndex);
+          this.onBlurElement.emit(this.getOutputParams(this.selectedElementIndex));
         });
       }
 
       this.zone.run(() => {
-        this.onClickElement.emit({ index: this.dragableElementIndex, clickCoords: { x: e.clientX, y: e.clientY } });
+        this.onClickElement.emit({
+          ...this.getOutputParams(this.draggableElementIndex),
+          clickCoords: { x: e.clientX, y: e.clientY }
+        });
       });
 
-      if (this.selectedElementIndex !== this.dragableElementIndex) {
-        this.selectedElementIndex = this.dragableElementIndex;
+      if (this.selectedElementIndex !== this.draggableElementIndex) {
+        this.selectedElementIndex = this.draggableElementIndex;
         this.zone.run(() => {
-          this.onFocusElement.emit(this.selectedElementIndex);
+          this.onFocusElement.emit(this.getOutputParams(this.selectedElementIndex));
         });
       }
     } else {
       if (this.selectedElementIndex >= 0) {
         this.zone.run(() => {
-          this.onBlurElement.emit(this.selectedElementIndex);
+          this.onBlurElement.emit(this.getOutputParams(this.selectedElementIndex));
         });
       }
 
@@ -310,11 +318,11 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     if (this.resizableElementIndex >= 0) {
 
       if (!this.resizeStarted) {
-        this.onResizeStart.emit(this.resizableElementIndex);
+        this.onResizeStart.emit(this.getOutputParams(this.resizableElementIndex));
         this.resizeStarted = true;
       } else {
         this.zone.run(() => {
-          this.onResizing.emit(this.resizableElementIndex);
+          this.onResizing.emit(this.getOutputParams(this.resizableElementIndex));
         });
       }
 
@@ -326,7 +334,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
       this.drawElements();
     }
     // drag existing element
-    else if (this.dragableElementIndex >= 0) {
+    else if (this.draggableElementIndex >= 0) {
       const { width, height } = this.newElement;
 
       if (
@@ -341,16 +349,16 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
       if (!this.dragStarted) {
         this.zone.run(() => {
-          this.onDragStart.emit(this.dragableElementIndex);
+          this.onDragStart.emit(this.getOutputParams(this.draggableElementIndex));
         });
         this.dragStarted = true;
       } else {
         this.zone.run(() => {
-          this.onDragging.emit(this.dragableElementIndex);
+          this.onDragging.emit(this.getOutputParams(this.draggableElementIndex));
         });
       }
 
-      let targetEl = this.elements[this.dragableElementIndex];
+      let targetEl = this.elements[this.draggableElementIndex];
       targetEl.x += width;
       targetEl.y += height;
 
@@ -379,7 +387,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
         ctx: this.ctx,
         elem,
         fill: true,
-        isHovered: this.dragableElementIndex === index
+        isHovered: this.draggableElementIndex === index
       };
 
       this.drawNewElement(drawProps);
@@ -416,15 +424,15 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   };
 
   /**
-  * Handle canvas mouse movement when mouse is up
-  * @param mouseEvent
-  */
+   * Handle canvas mouse movement when mouse is up
+   * @param e
+   */
   handleMouseMovement = (e: MouseEvent): void => {
   	if (this.mouseIsDown) {
       return;
     }
 
-    this.dragableElementIndex = -1;
+    this.draggableElementIndex = -1;
 		this.resizableElementIndex = -1;
 
 		const currentX = e.clientX - this.canvasX;
@@ -438,38 +446,38 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
       this.currentHandle = detectCurrentHandle({ x: currentX, y: currentY }, elem);
       if (this.currentHandle) {
         this.resizableElementIndex = index;
-        this.dragableElementIndex = -1;
+        this.draggableElementIndex = -1;
 				break;
 			}
 
 			if (mouseIsOverElement) {
-				this.dragableElementIndex = index;
+				this.draggableElementIndex = index;
 				this.shadowOnHoveredElement = true;
 				this.drawElements();
         break;
 			}
 		}
 
-    if (this.mouseEnterElementIndex < 0 && this.dragableElementIndex >= 0) {
-      this.mouseEnterElementIndex = this.dragableElementIndex;
+    if (this.mouseEnterElementIndex < 0 && this.draggableElementIndex >= 0) {
+      this.mouseEnterElementIndex = this.draggableElementIndex;
       this.zone.run(() => {
-        this.onMouseEnterElement.emit(this.mouseEnterElementIndex);
+        this.onMouseEnterElement.emit(this.getOutputParams(this.mouseEnterElementIndex));
       });
     }
 
-    if (this.mouseEnterElementIndex >= 0 && this.dragableElementIndex < 0) {
+    if (this.mouseEnterElementIndex >= 0 && this.draggableElementIndex < 0) {
       this.zone.run(() => {
-        this.onMouseLeaveElement.emit(this.mouseEnterElementIndex);
+        this.onMouseLeaveElement.emit(this.getOutputParams(this.mouseEnterElementIndex));
       });
       this.mouseEnterElementIndex = -1;
     }
 
-		if (this.dragableElementIndex < 0 && this.shadowOnHoveredElement) {
+		if (this.draggableElementIndex < 0 && this.shadowOnHoveredElement) {
 			this.drawElements();
 			this.shadowOnHoveredElement = false;
 		}
 
-    setCursorType(this.dragableElementIndex, this.currentHandle);
+    setCursorType(this.draggableElementIndex, this.currentHandle);
   };
 
   /**
@@ -492,6 +500,17 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
       }
     } else {
       this.canvasBackground$.next(this.backgroundColor);
+    }
+  }
+
+  /**
+  * Returns params for output event
+   * @param targetIndex
+   */
+  getOutputParams(targetIndex: number): IOutputEvent {
+    return {
+      index: targetIndex,
+      element: this.elements[targetIndex]
     }
   }
 

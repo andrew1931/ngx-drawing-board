@@ -15,7 +15,7 @@ export class BaseShape {
 
   protected text = {
     defaultFontWeight: 300,
-    defaultFontSize: '18px',
+    defaultFontSize: '28px',
     defaultFontFamily: 'Arial',
     defaultFontStyle: 'normal',
     defaultColor: '#000'
@@ -60,9 +60,9 @@ export class BaseShape {
 
 
     // draw shape border
-    if (elem.border) {
-      ctx.strokeStyle = elem.border.color || this.border.defaultColor;
-			ctx.lineWidth = elem.border.width || this.border.defaultWidth;
+    if (elem.border && elem.border.color) {
+      ctx.strokeStyle = elem.border.color;
+      ctx.lineWidth = elem.border.width || this.border.defaultWidth;
 			ctx.stroke();
     }
 
@@ -85,6 +85,7 @@ export class BaseShape {
 
       if (align === 'left') {
         textX = elem.x;
+        ctx.textAlign = 'left';
       }
 
       if (align === 'right') {
@@ -92,7 +93,7 @@ export class BaseShape {
         ctx.textAlign = 'right';
       }
 
-      ctx.fillText(value, textX, textY, elem.width);
+      ctx.fillText(value, textX, textY);
     }
 	};
 
