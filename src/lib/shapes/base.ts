@@ -32,7 +32,7 @@ export class BaseShape {
     }
 	};
 
-  public drawElemet({ ctx, elem, fill = false, isHovered }: IDrawElement): void {
+  public drawElement({ ctx, elem, fill = false, isHovered }: IDrawElement): void {
     if (ctx === null) {
       return;
     }

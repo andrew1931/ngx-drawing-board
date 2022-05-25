@@ -5,7 +5,7 @@ import { BaseShape } from './base';
 @Injectable()
 export class Triangle extends BaseShape {
 
-  override drawElemet(props: IDrawElement): void {
+  override drawElement(props: IDrawElement): void {
     if (props.ctx === null) {
       return;
     }
@@ -25,7 +25,7 @@ export class Triangle extends BaseShape {
 
     props.ctx.closePath();
 
-    super.drawElemet(props);
+    super.drawElement(props);
   };
 
 }

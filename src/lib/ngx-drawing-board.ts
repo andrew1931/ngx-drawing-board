@@ -20,10 +20,10 @@ import {
   map,
   Subscription
 } from 'rxjs';
-import { Rectangle, Ellips, Triangle } from './shapes';
+import { Rectangle, Ellipse, Triangle } from './shapes';
 import { IElement, EMouseHandle, IPoint, Shape, IDrawElement } from './types';
 import {
-  convertElemntNegativeProps,
+  convertElementNegativeProps,
   ensureFieldBordersOnResize,
   updateElementOnResize,
   ensureFieldBordersOnDrag,
@@ -40,7 +40,7 @@ import {
   template: `
     <canvas
       #canvas
-      [style.background]="canvasBackgound$ | async"
+      [style.background]="canvasBackground$ | async"
       [width]="canvasWidth$ | async"
       [height]="canvasHeight$ | async"
     ></canvas>
@@ -68,21 +68,21 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   @Output() onResizing = new EventEmitter<number>();
   @Output() onResizeEnd = new EventEmitter<number>();
   @Output() onDragStart = new EventEmitter<number>();
-  @Output() onDraging = new EventEmitter<number>();
+  @Output() onDragging = new EventEmitter<number>();
   @Output() onDragEnd = new EventEmitter<number>();
 
 
-  @ViewChild('canvas') canvasEl: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvas') canvasEl: ElementRef<HTMLCanvasElement> | undefined;
 
   public canvasWidth$: BehaviorSubject<number> = new BehaviorSubject(0);
   public canvasHeight$: BehaviorSubject<number> = new BehaviorSubject(0);
-  public canvasBackgound$: BehaviorSubject<string> = new BehaviorSubject('');
+  public canvasBackground$: BehaviorSubject<string> = new BehaviorSubject('');
 
-  private canvas: HTMLCanvasElement;
+  private canvas: HTMLCanvasElement | undefined;
 
   private readonly minElementSize = 5;
 
-  private newElement: IElement;
+  private newElement: IElement = this.emptyElement;
 
   private mouseEnterElementIndex: number = -1;
 	private dragableElementIndex: number = -1;
@@ -97,7 +97,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
 
   get ctx(): CanvasRenderingContext2D | null {
-		return this.canvas.getContext('2d');
+		return this.canvas ? this.canvas.getContext('2d') : null;
 	};
 
 	get canvasX(): number {
@@ -109,7 +109,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 	};
 
 	get emptyElement(): IElement {
-		return {
+    return {
       x: 0,
       y: 0,
       width: 0,
@@ -124,7 +124,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   constructor(
     private readonly zone: NgZone,
     private rectangle: Rectangle,
-    private ellips: Ellips,
+    private ellipse: Ellipse,
     private triangle: Triangle
   ) {}
 
@@ -133,7 +133,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   */
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.elements && this.canvas) {
-      this.drawElemets();
+      this.drawElements();
     }
   };
 
@@ -149,9 +149,9 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   */
   ngAfterViewInit(): void {
     this.newElement = this.emptyElement;
-    this.canvas = this.canvasEl.nativeElement;
+    this.canvas = this.canvasEl?.nativeElement;
 
-    this.drawElemets();
+    this.drawElements();
 
     this.initEventsSubscriptions();
   };
@@ -167,6 +167,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   * Init mousedown, mouseup, mousemove event listeners
   */
   private initEventsSubscriptions(): void {
+    if (!this.canvas) { return }
     const canvasMouseDown$ = fromEvent(this.canvas, 'mousedown');
     const canvasMouseMove$ = fromEvent(this.canvas, 'mousemove');
     const windowMouseMove$ = fromEvent(window, 'mousemove');
@@ -210,15 +211,15 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
     // end of resizing
 		if (this.resizableElementIndex >= 0) {
-			let targeEl = this.elements[this.resizableElementIndex]
-			this.elements[this.resizableElementIndex] = convertElemntNegativeProps(targeEl);
+			let targetEl = this.elements[this.resizableElementIndex]
+			this.elements[this.resizableElementIndex] = convertElementNegativeProps(targetEl);
       this.zone.run(() => {
         this.onResizeEnd.emit(this.resizableElementIndex);
         this.resizeStarted = false;
       });
 		}
 
-    // end of draging
+    // end of dragging
     if (this.dragableElementIndex >= 0) {
       this.zone.run(() => {
         if (this.dragStarted) {
@@ -230,7 +231,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
     // end of drawing
 		if (this.dragableElementIndex < 0 && this.resizableElementIndex < 0) {
-			const newElem = convertElemntNegativeProps({...this.newElement});
+			const newElem = convertElementNegativeProps({ ...this.newElement });
 			if (newElem.width > this.minElementSize && newElem.height > this.minElementSize) {
 				this.elements.push(newElem);
         this.zone.run(() => {
@@ -239,13 +240,13 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
         this.newElement = this.emptyElement;
 			}
 		}
-    this.drawElemets();
+    this.drawElements();
 	};
 
   /**
-  * Handle canvas mouse down
-  * @param mouseEvent
-  */
+   * Handle canvas mouse down
+   * @param e
+   */
 	mouseDownListener = (e: MouseEvent): void => {
     e.preventDefault();
     e.stopPropagation();
@@ -280,13 +281,13 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
       this.selectedElementIndex = -1;
     }
-    this.drawElemets();
+    this.drawElements();
 	};
 
   /**
-  * Handle canvas mouse movement during drawing, resizing, draging
-  * @param mouseEvent
-  */
+   * Handle canvas mouse movement during drawing, resizing, draging
+   * @param e
+   */
 	mouseMoveListener = (e: MouseEvent): void => {
     if (!this.mouseIsDown) {
       return;
@@ -322,7 +323,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
       this.elements[this.resizableElementIndex] = resizedEl;
 
-      this.drawElemets();
+      this.drawElements();
     }
     // drag existing element
     else if (this.dragableElementIndex >= 0) {
@@ -345,7 +346,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
         this.dragStarted = true;
       } else {
         this.zone.run(() => {
-          this.onDraging.emit(this.dragableElementIndex);
+          this.onDragging.emit(this.dragableElementIndex);
         });
       }
 
@@ -355,14 +356,14 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
       targetEl = ensureFieldBordersOnDrag(targetEl, this.canvasWidth$.value, this.canvasHeight$.value);
 
-      this.drawElemets();
+      this.drawElements();
 
       this.newElement.x = this.mouseCoords.x;
       this.newElement.y = this.mouseCoords.y;
     }
     // draw new element
     else {
-      this.drawElemets();
+      this.drawElements();
       this.drawNewElement();
     }
 	};
@@ -370,7 +371,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   /**
   * Draw all elements from `this.elements` list
   */
-	drawElemets = (): void => {
+	drawElements = (): void => {
 		this.rectangle.clearFeild(this.ctx, this.canvasWidth$.value, this.canvasHeight$.value);
 
 		for (let [index, elem] of this.elements.entries()) {
@@ -401,15 +402,15 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     const drawProps = props || _props;
 
     if (isRectangle(drawProps.elem)) {
-      this.rectangle.drawElemet(drawProps);
+      this.rectangle.drawElement(drawProps);
     }
 
     if (isCircle(drawProps.elem)) {
-      this.ellips.drawElemet(drawProps);
+      this.ellipse.drawElement(drawProps);
     }
 
     if (isTriangle(drawProps.elem)) {
-      this.triangle.drawElemet(drawProps);
+      this.triangle.drawElement(drawProps);
     }
 
   };
@@ -444,7 +445,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 			if (mouseIsOverElement) {
 				this.dragableElementIndex = index;
 				this.shadowOnHoveredElement = true;
-				this.drawElemets();
+				this.drawElements();
         break;
 			}
 		}
@@ -464,7 +465,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     }
 
 		if (this.dragableElementIndex < 0 && this.shadowOnHoveredElement) {
-			this.drawElemets();
+			this.drawElements();
 			this.shadowOnHoveredElement = false;
 		}
 
@@ -479,7 +480,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     this.canvasHeight$.next(this.height);
 
     if (this.backgroundImage) {
-      this.canvasBackgound$.next('url('+ this.backgroundImage +')');
+      this.canvasBackground$.next('url('+ this.backgroundImage +')');
 
       if (this.fitCanvasToImage) {
         const background = new Image();
@@ -490,7 +491,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
         }
       }
     } else {
-      this.canvasBackgound$.next(this.backgroundColor);
+      this.canvasBackground$.next(this.backgroundColor);
     }
   }
 

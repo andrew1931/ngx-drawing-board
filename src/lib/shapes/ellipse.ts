@@ -3,9 +3,9 @@ import { IDrawElement } from '../types';
 import { BaseShape } from './base';
 
 @Injectable()
-export class Ellips extends BaseShape {
+export class Ellipse extends BaseShape {
 
-  override drawElemet(props: IDrawElement): void {
+  override drawElement(props: IDrawElement): void {
     if (props.ctx === null) {
       return;
     }
@@ -14,8 +14,8 @@ export class Ellips extends BaseShape {
     const mouseX = width + x;
     const mouseY = height + y;
 
-    const scaleX = 1 * ((mouseX - x) / 2);
-    const scaleY = 1 * ((mouseY - y) / 2);
+    const scaleX = ((mouseX - x) / 2);
+    const scaleY = ((mouseY - y) / 2);
     const centerX = (x / scaleX) + 1;
     const centerY = (y / scaleY) + 1;
     props.ctx.save();
@@ -24,7 +24,7 @@ export class Ellips extends BaseShape {
     props.ctx.arc(centerX, centerY, 1, 0, 2 * Math.PI);
     props.ctx.restore();
 
-    super.drawElemet(props);
+    super.drawElement(props);
 	};
 
 }

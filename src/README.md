@@ -57,20 +57,20 @@ export class SomeModule {}
 | fitCanvasToImage | boolean | true | no | makes canvas the same size as provided background image |
 
 ### Outputs
-| Output  | Arguments | Description |
-| ------------- | ------------- | -------------
+| Output  | Arguments | Description                                     |
+| ------------- | ------------- |-------------------------------------------------
 | (onAddElement) | IElement | Fires when new element has been drawn on canvas |
-| (onClickElement) | {index: number, clickCoords: { x: number, y: number }} |Fires when element has been clicked |
-| (onFocusElement) | number (element index) |Fires when element gets focus |
-| (onBlurElement) | number (element index) | Fires when selected element looses focus |
-| (onMouseEnterElement) | number (element index) | Fires when mouse enteres element |
-| (onMouseLeaveElement) | number (element index) | Fires when mouse leaves element |
-| (onResizeStart) | number (element index) | Fires when element's resizing has started |
-| (onResizing) | number (element index) | Fires when element is being resized |
-| (onResizeEnd) | number (element index) | Fires when element's resizing is over |
-| (onDragStart) | number (element index) | Fires when element's draging has started |
-| (onDraging) | number (element index) | Fires when element is being draged |
-| (onDragEnd) | number (element index) | Fires when element's draging is over |
+| (onClickElement) | {index: number, clickCoords: { x: number, y: number }} | Fires when element has been clicked             |
+| (onFocusElement) | number (element index) | Fires when element gets focus                   |
+| (onBlurElement) | number (element index) | Fires when selected element looses focus        |
+| (onMouseEnterElement) | number (element index) | Fires when mouse enteres element                |
+| (onMouseLeaveElement) | number (element index) | Fires when mouse leaves element                 |
+| (onResizeStart) | number (element index) | Fires when element's resizing has started       |
+| (onResizing) | number (element index) | Fires when element is being resized             |
+| (onResizeEnd) | number (element index) | Fires when element's resizing is over           |
+| (onDragStart) | number (element index) | Fires when element's dragging has started       |
+| (onDragging) | number (element index) | Fires when element is being draged              |
+| (onDragEnd) | number (element index) | Fires when element's dragging is over           |
 
 ## Types
 ```ts
@@ -100,7 +100,7 @@ export class SomeModule {}
     width?: number,
   };
 
-  type Shape = 'rectangle' | 'ellips' | 'triangle';
+  type Shape = 'rectangle' | 'ellipse' | 'triangle';
 
 
 ```

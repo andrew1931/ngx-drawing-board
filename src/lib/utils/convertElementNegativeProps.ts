@@ -1,6 +1,6 @@
 import { IElement } from '../types';
 
-export const convertElemntNegativeProps = (elem: IElement): IElement => {
+export const convertElementNegativeProps = (elem: IElement): IElement => {
   if (elem.width < 0) {
     elem.x = elem.x + elem.width;
     elem.width = (elem.width * -1);

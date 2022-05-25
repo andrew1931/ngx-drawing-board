@@ -7,7 +7,7 @@ export interface IElement {
   color: string,
   text?: IElementText,
   border?: IElementBorder,
-};
+}
 
 export interface IElementText {
   value: string,
@@ -17,29 +17,29 @@ export interface IElementText {
   fontStyle?: string,
   fontSize?: string,
   align?: 'left' | 'center' | 'right',
-};
+}
 
 export interface IElementBorder {
   color?: string,
   width?: number,
-};
+}
 
 export interface IDrawElement {
 	ctx: CanvasRenderingContext2D | null,
 	elem: IElement,
 	fill?: boolean,
 	isHovered?: boolean,
-};
+}
 
 export interface IDrawHandle {
 	ctx: CanvasRenderingContext2D | null,
 	elem: IElement,
-};
+}
 
 export interface IPoint {
 	x: number,
 	y: number,
-};
+}
 
 export enum EMouseHandle {
 	topLeft = 'topLeft',
@@ -51,6 +51,6 @@ export enum EMouseHandle {
 	bottom = 'bottom',
 	right = 'right',
   center = 'center',
-};
+}
 
-export type Shape = 'rectangle' | 'ellips' | 'triangle';
+export type Shape = 'rectangle' | 'ellipse' | 'triangle';
