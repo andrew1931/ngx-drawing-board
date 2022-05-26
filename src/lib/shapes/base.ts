@@ -1,5 +1,5 @@
-import { EMouseHandle, IDrawElement, IDrawHandle, IElement, IPoint } from '../types';
-import { isImage } from '../utils';
+import { EMouseHandle, IDrawElement, IDrawHandle } from '../types';
+import { getHandlePosition, isImage } from '../utils';
 
 export const HANDLE_SIZE = 5;
 
@@ -27,7 +27,7 @@ export class BaseShape {
     defaultColor: '#000',
   };
 
-  public clearFeild(ctx: CanvasRenderingContext2D | null, width: number, height: number): void {
+  public clearField(ctx: CanvasRenderingContext2D | null, width: number, height: number): void {
     if (ctx) {
       ctx.clearRect(0, 0, width, height);
     }
@@ -69,7 +69,6 @@ export class BaseShape {
       } else {
         ctx.stroke();
       }
-
     }
 
     // draw text inside shape
@@ -109,47 +108,14 @@ export class BaseShape {
       return;
     }
 		for (const handleType of Object.values(EMouseHandle)) {
-			const handle = this.getHandlePosition(handleType, elem);
+			const handle = getHandlePosition(handleType, elem);
       if (handle) {
         ctx.fillStyle = this.handleFillStyle;
-        ctx.globalCompositeOperation = 'xor';
         ctx.beginPath();
         ctx.arc(handle.x, handle.y, HANDLE_SIZE, 0, 2 * Math.PI);
         ctx.fill();
-        ctx.globalCompositeOperation = 'source-over';
       }
 		}
 	};
-
-  private getHandlePosition(currentHandle: EMouseHandle, elem: IElement): IPoint | null {
-    let handlePosition: IPoint | null = null;
-    switch (currentHandle) {
-      case EMouseHandle.topLeft:
-        handlePosition = { x: elem.x, y: elem.y };
-        break;
-      case EMouseHandle.topRight:
-        handlePosition = { x: elem.x + elem.width, y: elem.y };
-        break;
-      case EMouseHandle.bottomLeft:
-        handlePosition = { x: elem.x, y: elem.y + elem.height };
-        break;
-      case EMouseHandle.bottomRight:
-        handlePosition = { x: elem.x + elem.width, y: elem.y + elem.height };
-        break;
-      case EMouseHandle.top:
-        handlePosition = { x: elem.x + elem.width / 2, y: elem.y };
-        break;
-      case EMouseHandle.left:
-        handlePosition = { x: elem.x, y: elem.y + elem.height / 2 };
-        break;
-      case EMouseHandle.bottom:
-        handlePosition = { x: elem.x + elem.width / 2, y: elem.y + elem.height };
-        break;
-      case EMouseHandle.right:
-        handlePosition = { x: elem.x + elem.width, y: elem.y + elem.height / 2 };
-        break;
-      }
-    return handlePosition;
-  };
 
 }

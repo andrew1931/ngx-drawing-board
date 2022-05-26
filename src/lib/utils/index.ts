@@ -1,5 +1,6 @@
 export * from './convertElementNegativeProps';
 export * from './detectCurrentHandle';
+export * from './getHandlePosition';
 export * from './detectIfMouseIsOverElement';
 export * from './detectShape';
 export * from './ensureFieldBorders';

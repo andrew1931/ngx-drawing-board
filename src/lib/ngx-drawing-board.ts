@@ -245,9 +245,9 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
         this.zone.run(() => {
           this.onAddElement.emit(this.getOutputParams(this.elements.length - 1));
         });
-        this.newElement = this.emptyElement;
 			}
 		}
+    this.newElement = this.emptyElement;
     this.drawElements();
 	};
 
@@ -379,7 +379,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   * Draw all elements from `this.elements` list
   */
 	drawElements = (): void => {
-		this.rectangle.clearFeild(this.ctx, this.canvasWidth$.value, this.canvasHeight$.value);
+		this.rectangle.clearField(this.ctx, this.canvasWidth$.value, this.canvasHeight$.value);
 
 		for (let [index, elem] of this.elements.entries()) {
       const drawProps = {
@@ -410,18 +410,22 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
     if (isRectangle(drawProps.elem)) {
       this.rectangle.drawElement(drawProps);
+      return;
     }
 
     if (isCircle(drawProps.elem)) {
       this.ellipse.drawElement(drawProps);
+      return;
     }
 
     if (isTriangle(drawProps.elem)) {
       this.triangle.drawElement(drawProps);
+      return;
     }
 
     if (isImage(drawProps.elem)) {
       this.image.drawElement(drawProps);
+      return;
     }
 
   };
