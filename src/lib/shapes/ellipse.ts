@@ -18,6 +18,7 @@ export class Ellipse extends BaseShape {
     const centerX = (x / scaleX) + 1;
     const centerY = (y / scaleY) + 1;
 
+    props.ctx.setLineDash([]);
     props.ctx.save();
 		props.ctx.beginPath();
     props.ctx.scale(scaleX ,scaleY);

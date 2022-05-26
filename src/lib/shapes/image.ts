@@ -12,6 +12,7 @@ export class Image extends BaseShape {
     const { x, y, width, height, imageSrc } = props.elem;
 
     if (imageSrc) {
+      props.ctx.setLineDash([]);
       props.ctx.beginPath();
       props.ctx.drawImage(imageSrc, x, y, width, height);
     }

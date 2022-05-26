@@ -80,8 +80,8 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
   @Input() data: IElement[] = [];
   @Input() shape: Shape = 'rectangle';
-  @Input() initialElementColor: string = '#ffffff';
-  @Input() backgroundColor: string = '#f2f2f2';
+  @Input() initialElementColor: string = 'transparent';
+  @Input() backgroundColor: string = '#ffffff';
   @Input() backgroundImage: string = '';
   @Input() width: number = 600;
   @Input() height: number = 600;

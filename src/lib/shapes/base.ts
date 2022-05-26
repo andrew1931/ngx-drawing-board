@@ -34,10 +34,29 @@ export class BaseShape {
       return;
     }
 
+    let borderIsDashed = true;
+
+    // draw shape border
+    if (elem.border && elem.border.color) {
+      ctx.strokeStyle = elem.border.color;
+      const borderWidth = elem.border.width ?? 0;
+      ctx.lineWidth = borderWidth;
+      if (borderWidth > 0) {
+        borderIsDashed = false;
+        if (isImage(elem)) {
+          ctx.strokeRect(elem.x, elem.y, elem.width, elem.height);
+        } else {
+          ctx.stroke();
+        }
+      }
+    }
+
     // draw shape shadow on hover
 		if (fill) {
+      if (elem.color !== 'transparent') {
+        borderIsDashed = false;
+      }
       ctx.fillStyle = elem.color;
-      ctx.closePath();
 
 			if (isHovered) {
 				ctx.shadowColor = this.shadow.color;
@@ -48,23 +67,13 @@ export class BaseShape {
         ctx.shadowBlur = 0;
 			}
 			ctx.fill();
-
-		} else {
-			ctx.strokeStyle = this.border.defaultColor;
-			ctx.lineWidth = this.border.defaultWidth;
-			ctx.stroke();
 		}
 
-    // draw shape border
-    if (elem.border && elem.border.color) {
-      ctx.strokeStyle = elem.border.color;
-      ctx.lineWidth = elem.border.width || this.border.defaultWidth;
-      if (isImage(elem)) {
-        const { x, y, width, height } = elem;
-        ctx.strokeRect(x, y, width, height);
-      } else {
-        ctx.stroke();
-      }
+    if (borderIsDashed) {
+      ctx.setLineDash([5, 3]);
+      ctx.strokeStyle = this.border.defaultColor;
+      ctx.lineWidth = this.border.defaultWidth;
+      ctx.stroke();
     }
 
     // draw text inside shape
@@ -106,9 +115,10 @@ export class BaseShape {
   };
 
   public drawGrid(ctx: CanvasRenderingContext2D | null, gridConfig: IDrawGridConfig, width: number, height: number): void {
+    // Anti-aliasing fix. This makes the lines look crisp and sharp
+    ctx?.translate(0.5, 0.5);
 
     const { cellSize, strokeColor, strokeWidth } = gridConfig;
-
     let currentY = 0;
     while (currentY < height) {
       drawLine({
@@ -135,6 +145,7 @@ export class BaseShape {
       if (ctx === null) {
         return;
       }
+
       ctx.beginPath();
       ctx.moveTo(startX, startY);
       ctx.lineTo(endX, endY);

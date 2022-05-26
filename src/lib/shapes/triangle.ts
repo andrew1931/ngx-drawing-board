@@ -14,6 +14,7 @@ export class Triangle extends BaseShape {
     const mouseX = width + x;
     const mouseY = height + y;
 
+    props.ctx.setLineDash([]);
     props.ctx.beginPath();
     props.ctx.lineWidth = 1;
     props.ctx.moveTo(x + (mouseX - x) / 2, y);

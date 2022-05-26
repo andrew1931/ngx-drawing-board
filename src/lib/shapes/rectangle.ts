@@ -10,6 +10,7 @@ export class Rectangle extends BaseShape {
       return;
     }
 
+    props.ctx.setLineDash([]);
     props.ctx.beginPath();
     props.ctx.rect(props.elem.x, props.elem.y, props.elem.width, props.elem.height);
 
