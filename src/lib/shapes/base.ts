@@ -1,4 +1,5 @@
 import { EMouseHandle, IDrawElement, IDrawHandle, IElement, IPoint } from '../types';
+import { isImage } from '../utils';
 
 export const HANDLE_SIZE = 5;
 
@@ -39,8 +40,8 @@ export class BaseShape {
 
     // draw shape shadow on hover
 		if (fill) {
-			ctx.fillStyle = elem.color;
-			ctx.closePath();
+      ctx.fillStyle = elem.color;
+      ctx.closePath();
 
 			if (isHovered) {
 				ctx.shadowColor = this.shadow.color;
@@ -62,7 +63,13 @@ export class BaseShape {
     if (elem.border && elem.border.color) {
       ctx.strokeStyle = elem.border.color;
       ctx.lineWidth = elem.border.width || this.border.defaultWidth;
-			ctx.stroke();
+      if (isImage(elem)) {
+        const { x, y, width, height } = elem;
+        ctx.strokeRect(x, y, width, height);
+      } else {
+        ctx.stroke();
+      }
+
     }
 
     // draw text inside shape
@@ -91,6 +98,7 @@ export class BaseShape {
         textX = elem.x + elem.width;
         ctx.textAlign = 'right';
       }
+      ctx.shadowColor = 'rgba(0,0,0,0)';
 
       ctx.fillText(value, textX, textY);
     }

@@ -83,6 +83,7 @@ export class SomeModule {}
     color: string,
     text?: IElementText,
     border?: IElementBorder,
+    imageSrc?: CanvasImageSource,
   }
   
   interface IElementText {
@@ -111,7 +112,7 @@ export class SomeModule {}
     clickCoords: IPoint
   }
 
-  type Shape = 'rectangle' | 'ellipse' | 'triangle';
+  type Shape = 'rectangle' | 'ellipse' | 'triangle' | 'image';
 
 
 ```

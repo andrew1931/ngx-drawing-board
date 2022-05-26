@@ -7,6 +7,7 @@ export interface IElement {
   color: string,
   text?: IElementText,
   border?: IElementBorder,
+  imageSrc?: CanvasImageSource,
 }
 
 export interface IElementText {
@@ -53,7 +54,7 @@ export enum EMouseHandle {
   center = 'center',
 }
 
-export type Shape = 'rectangle' | 'ellipse' | 'triangle';
+export type Shape = 'rectangle' | 'ellipse' | 'triangle' | 'image';
 
 export interface IOutputEvent {
   index: number,

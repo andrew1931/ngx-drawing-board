@@ -20,7 +20,7 @@ import {
   map,
   Subscription
 } from 'rxjs';
-import { Rectangle, Ellipse, Triangle } from './shapes';
+import { Rectangle, Ellipse, Triangle, Image } from './shapes';
 import { IElement, EMouseHandle, IPoint, Shape, IDrawElement, IOutputEvent, IOutputClickEvent } from './types';
 import {
   convertElementNegativeProps,
@@ -32,8 +32,10 @@ import {
   detectIfMouseIsOverElement,
   detectCurrentHandle,
   setCursorType,
-  isTriangle
+  isTriangle,
+  isImage
 } from './utils';
+
 
 @Component({
   selector: 'ngx-drawing-board',
@@ -116,7 +118,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
       width: 0,
       height: 0,
       shape: this.shape,
-      color: this.initialElementColor
+      color: this.initialElementColor,
     };
 	};
 
@@ -126,7 +128,8 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     private readonly zone: NgZone,
     private rectangle: Rectangle,
     private ellipse: Ellipse,
-    private triangle: Triangle
+    private triangle: Triangle,
+    private image: Image
   ) {}
 
   /**
@@ -417,6 +420,10 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
       this.triangle.drawElement(drawProps);
     }
 
+    if (isImage(drawProps.elem)) {
+      this.image.drawElement(drawProps);
+    }
+
   };
 
   /**
@@ -486,7 +493,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
       this.canvasBackground$.next('url('+ this.backgroundImage +')');
 
       if (this.fitCanvasToImage) {
-        const background = new Image();
+        const background: any = new Image();
         background.src = this.backgroundImage;
         background.onload = () => {
           this.canvasWidth$.next( background.width);
