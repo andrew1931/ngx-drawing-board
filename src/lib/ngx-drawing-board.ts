@@ -523,7 +523,6 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 				this.draggableElementIndex = index;
 				this.shadowOnHoveredElement = true;
 				this.drawElements();
-        break;
 			}
 		}
 
