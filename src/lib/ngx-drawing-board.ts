@@ -20,8 +20,24 @@ import {
   map,
   Subscription
 } from 'rxjs';
-import { Rectangle, Ellipse, Triangle, Image } from './shapes';
-import { IElement, EMouseHandle, IPoint, Shape, IDrawElement, IOutputEvent, IOutputClickEvent } from './types';
+import {
+  Rectangle,
+  Ellipse,
+  Triangle,
+  Image,
+  BaseShape
+} from './shapes';
+import {
+  IElement,
+  EMouseHandle,
+  IPoint,
+  Shape,
+  IDrawElement,
+  IOutputEvent,
+  IOutputClickEvent,
+  IGridConfig,
+  IDrawGridConfig,
+} from './types';
 import {
   convertElementNegativeProps,
   ensureFieldBordersOnResize,
@@ -40,13 +56,24 @@ import {
 @Component({
   selector: 'ngx-drawing-board',
   template: `
-    <canvas
-      #canvas
-      [style.background]="canvasBackground$ | async"
-      [width]="canvasWidth$ | async"
-      [height]="canvasHeight$ | async"
-    ></canvas>
+    <div [style.position]="'relative'">
+      <canvas
+        #canvasBackground
+        [style.background]="canvasBackground$ | async"
+        [width]="canvasWidth$ | async"
+        [height]="canvasHeight$ | async"
+      ></canvas>
+      <canvas
+        #canvas
+        [style.background]="'transparent'"
+        [width]="canvasWidth$ | async"
+        [height]="canvasHeight$ | async"
+      ></canvas>
+    </div>
   `,
+  styles: [
+    'canvas { position: absolute; left: 0; top: 0 }'
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDestroy {
@@ -59,6 +86,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() width: number = 600;
   @Input() height: number = 600;
   @Input() fitCanvasToImage: boolean = true;
+  @Input() gridConfig: IGridConfig = { enabled: true };
 
   @Output() onAddElement = new EventEmitter<IOutputEvent>();
   @Output() onClickElement = new EventEmitter<IOutputClickEvent>();
@@ -74,12 +102,14 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   @Output() onDragEnd = new EventEmitter<IOutputEvent>();
 
 
+  @ViewChild('canvasBackground') canvasBackgroundEl: ElementRef<HTMLCanvasElement> | undefined;
   @ViewChild('canvas') canvasEl: ElementRef<HTMLCanvasElement> | undefined;
 
   public canvasWidth$: BehaviorSubject<number> = new BehaviorSubject(0);
   public canvasHeight$: BehaviorSubject<number> = new BehaviorSubject(0);
   public canvasBackground$: BehaviorSubject<string> = new BehaviorSubject('');
 
+  private canvasBackground: HTMLCanvasElement | undefined;
   private canvas: HTMLCanvasElement | undefined;
 
   private readonly minElementSize = 5;
@@ -98,6 +128,9 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 	private shadowOnHoveredElement: boolean = false;
   private currentHandle: EMouseHandle | false = false;
 
+  get ctxBackground(): CanvasRenderingContext2D | null {
+    return this.canvasBackground ? this.canvasBackground.getContext('2d') : null;
+  };
 
   get ctx(): CanvasRenderingContext2D | null {
 		return this.canvas ? this.canvas.getContext('2d') : null;
@@ -126,6 +159,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
   constructor(
     private readonly zone: NgZone,
+    private baseShape: BaseShape,
     private rectangle: Rectangle,
     private ellipse: Ellipse,
     private triangle: Triangle,
@@ -136,9 +170,16 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   * Re-draw all elements when `this.elements` list changes
   */
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.canvas && changes.data) {
-      this.elements = [...changes.data.currentValue];
-      this.drawElements();
+    if (this.canvas) {
+      if (changes.gridConfig) {
+        this.drawElements();
+        this.drawCanvasGrid();
+      }
+
+      if (changes.data) {
+        this.elements = [...changes.data.currentValue];
+        this.drawElements();
+      }
     }
   };
 
@@ -153,13 +194,16 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   };
 
   /**
-  * Init newElement and canvas properties, draw initial elemets, set event listeners
+  * Init newElement and canvas properties, draw initial elements, grid, set event listeners
   */
   ngAfterViewInit(): void {
     this.newElement = this.emptyElement;
     this.canvas = this.canvasEl?.nativeElement;
+    this.canvasBackground = this.canvasBackgroundEl?.nativeElement;
 
     this.drawElements();
+
+    this.drawCanvasGrid();
 
     this.initEventsSubscriptions();
   };
@@ -259,8 +303,9 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     e.preventDefault();
     e.stopPropagation();
 
-		this.newElement.x = e.clientX - this.canvasX;
-		this.newElement.y = e.clientY - this.canvasY;
+    const { x, y } = this.getMouseCoords(e);
+		this.newElement.x = x;
+		this.newElement.y = y;
 		this.mouseIsDown = true;
     if (this.draggableElementIndex >= 0) {
 
@@ -370,8 +415,9 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     }
     // draw new element
     else {
+      const newElementProps = { ctx: this.ctx, elem: this.newElement };
       this.drawElements();
-      this.drawNewElement();
+      this.drawElement(newElementProps);
     }
 	};
 
@@ -379,7 +425,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   * Draw all elements from `this.elements` list
   */
 	drawElements = (): void => {
-		this.rectangle.clearField(this.ctx, this.canvasWidth$.value, this.canvasHeight$.value);
+		this.baseShape.clearField(this.ctx, this.canvasWidth$.value, this.canvasHeight$.value);
 
 		for (let [index, elem] of this.elements.entries()) {
       const drawProps = {
@@ -389,10 +435,10 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
         isHovered: this.draggableElementIndex === index
       };
 
-      this.drawNewElement(drawProps);
+      this.drawElement(drawProps);
 
       if (index === this.selectedElementIndex) {
-        this.rectangle.drawHandles({ ctx: this.ctx, elem });
+        this.baseShape.drawHandles({ ctx: this.ctx, elem });
       }
 		}
   };
@@ -400,34 +446,51 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   /**
   * Draw new element
   */
-  drawNewElement = (props?: IDrawElement): void => {
-    const _props = {
-      ctx: this.ctx,
-      elem: this.newElement,
+  drawElement = (props: IDrawElement): void => {
+    if (isImage(props.elem)) {
+      this.image.drawElement(props);
+      return;
+    }
+
+    if (isRectangle(props.elem)) {
+      this.rectangle.drawElement(props);
+      return;
+    }
+
+    if (isCircle(props.elem)) {
+      this.ellipse.drawElement(props);
+      return;
+    }
+
+    if (isTriangle(props.elem)) {
+      this.triangle.drawElement(props);
+      return;
+    }
+  };
+
+  /**
+   * Draw canvas grid
+   */
+  drawCanvasGrid = (): void => {
+    const defaultGridConfig: IDrawGridConfig = {
+      enabled: true,
+      cellSize: 12,
+      strokeWidth: .3,
+      strokeColor: '#000000'
     };
 
-    const drawProps = props || _props;
+    const gridConfig = Object.assign(defaultGridConfig, this.gridConfig);
 
-    if (isRectangle(drawProps.elem)) {
-      this.rectangle.drawElement(drawProps);
+    if (!gridConfig.enabled) {
       return;
     }
 
-    if (isCircle(drawProps.elem)) {
-      this.ellipse.drawElement(drawProps);
-      return;
-    }
-
-    if (isTriangle(drawProps.elem)) {
-      this.triangle.drawElement(drawProps);
-      return;
-    }
-
-    if (isImage(drawProps.elem)) {
-      this.image.drawElement(drawProps);
-      return;
-    }
-
+    this.baseShape.drawGrid(
+      this.ctxBackground,
+      gridConfig,
+      this.canvasWidth$.value,
+      this.canvasHeight$.value
+    );
   };
 
   /**

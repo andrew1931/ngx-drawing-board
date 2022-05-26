@@ -1,8 +1,10 @@
-import { EMouseHandle, IDrawElement, IDrawHandle } from '../types';
+import { EMouseHandle, IDrawElement, IDrawGridConfig, IDrawHandle, IDrawLine } from '../types';
 import { getHandlePosition, isImage } from '../utils';
+import { Injectable } from '@angular/core';
 
 export const HANDLE_SIZE = 5;
 
+@Injectable()
 export class BaseShape {
 
   protected handleFillStyle = '#00B100';
@@ -26,12 +28,6 @@ export class BaseShape {
     defaultWidth: 1,
     defaultColor: '#000',
   };
-
-  public clearField(ctx: CanvasRenderingContext2D | null, width: number, height: number): void {
-    if (ctx) {
-      ctx.clearRect(0, 0, width, height);
-    }
-	};
 
   public drawElement({ ctx, elem, fill = false, isHovered }: IDrawElement): void {
     if (ctx === null) {
@@ -102,6 +98,51 @@ export class BaseShape {
       ctx.fillText(value, textX, textY);
     }
 	};
+
+  public clearField(ctx: CanvasRenderingContext2D | null, width: number, height: number): void {
+    if (ctx) {
+      ctx.clearRect(0, 0, width, height);
+    }
+  };
+
+  public drawGrid(ctx: CanvasRenderingContext2D | null, gridConfig: IDrawGridConfig, width: number, height: number): void {
+
+    const { cellSize, strokeColor, strokeWidth } = gridConfig;
+
+    let currentY = 0;
+    while (currentY < height) {
+      drawLine({
+        startX: 0,
+        startY: currentY + cellSize,
+        endX: width,
+        endY: currentY + cellSize,
+      });
+      currentY += cellSize;
+    }
+
+    let currentX = 0;
+    while (currentX < width) {
+      drawLine({
+        startX: currentX + cellSize,
+        startY: 0,
+        endX: currentX + cellSize,
+        endY: height
+      });
+      currentX += cellSize;
+    }
+
+    function drawLine({ startX, startY, endX, endY }: IDrawLine): void {
+      if (ctx === null) {
+        return;
+      }
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(endX, endY);
+      ctx.strokeStyle = strokeColor;
+      ctx.lineWidth = strokeWidth;
+      ctx.stroke();
+    }
+  };
 
   public drawHandles({ ctx, elem }: IDrawHandle): void {
     if (ctx === null) {

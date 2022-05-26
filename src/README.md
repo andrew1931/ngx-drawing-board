@@ -45,16 +45,17 @@ export class SomeModule {}
 
 ## API
 ### Inputs
-| Input               | Type     | Default      | Required | Description                                             |
-|---------------------|----------|--------------|----------|---------------------------------------------------------|
-| data                | IElement | []           | no       | List where all drawn elements are stored                |
-| width               | number   | 600          | no       | Width of canvas                                         |
-| height              | number   | 600          | no       | Height of canvas                                        |
-| shape               | Shape    | "rectangle"  | no       | Current drawing shape                                   |
-| backgroundImage     | string   | ""           | no       | Canvas background image                                 |
-| backgroundColor     | string   | "#f2f2f2"    | no       | Canvas background color                                 |
-| initialElementColor | string   | "#ffffff"    | no       | Drawing element initial color                           |
-| fitCanvasToImage    | boolean  | true         | no       | Makes canvas the same size as provided background image |
+| Input               | Type        | Default           | Required | Description                                             |
+|---------------------|-------------|-------------------|----------|---------------------------------------------------------|
+| data                | IElement    | []                | no       | List where all drawn elements are stored                |
+| width               | number      | 600               | no       | Width of canvas                                         |
+| height              | number      | 600               | no       | Height of canvas                                        |
+| shape               | Shape       | "rectangle"       | no       | Current drawing shape                                   |
+| backgroundImage     | string      | ""                | no       | Canvas background image                                 |
+| backgroundColor     | string      | "#f2f2f2"         | no       | Canvas background color                                 |
+| initialElementColor | string      | "#ffffff"         | no       | Drawing element initial color                           |
+| gridConfig          | IGridConfig | { enabled: true } | no       | Settings for canvas background grid                     |
+| fitCanvasToImage    | boolean     | true              | no       | Makes canvas the same size as provided background image |
 
 ### Outputs
 | Output                | Arguments         | Description                                     |
@@ -99,6 +100,13 @@ export class SomeModule {}
   interface IElementBorder {
     color?: string,
     width?: number,
+  }
+
+  interface IGridConfig {
+    enabled?: boolean,
+    cellSize?: number,
+    strokeWidth?: number,
+    strokeColor?: string,
   }
 
   interface IOutputEvent {

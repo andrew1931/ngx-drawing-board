@@ -37,6 +37,13 @@ export interface IDrawHandle {
 	elem: IElement,
 }
 
+export interface IDrawLine {
+  startX: number,
+  startY: number,
+  endX: number,
+  endY: number,
+}
+
 export interface IPoint {
 	x: number,
 	y: number,
@@ -63,4 +70,18 @@ export interface IOutputEvent {
 
 export interface IOutputClickEvent extends IOutputEvent {
   clickCoords: IPoint
+}
+
+export interface IGridConfig {
+  enabled?: boolean,
+  cellSize?: number,
+  strokeWidth?: number,
+  strokeColor?: string,
+}
+
+export interface IDrawGridConfig {
+  enabled: boolean,
+  cellSize: number,
+  strokeWidth: number,
+  strokeColor: string,
 }
