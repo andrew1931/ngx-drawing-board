@@ -1,4 +1,4 @@
-import { HANDLE_SIZE } from '../shapes/base';
+import { HANDLE_SIZE } from '../shapes';
 import { IPoint, IElement, EMouseHandle } from '../types';
 import { getHandlePosition } from './getHandlePosition';
 

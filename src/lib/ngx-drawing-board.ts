@@ -49,7 +49,8 @@ import {
   detectCurrentHandle,
   setCursorType,
   isTriangle,
-  isImage
+  isImage,
+  ensureGridStep
 } from './utils';
 
 
@@ -76,7 +77,7 @@ import {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDestroy {
+export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDestroy {
 
   @Input() data: IElement[] = [];
   @Input() shape: Shape = 'rectangle';
@@ -87,6 +88,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   @Input() height: number = 600;
   @Input() fitCanvasToImage: boolean = true;
   @Input() gridConfig: IGridConfig = { enabled: true };
+  @Input() gridSizeMouseStep: boolean = false;
 
   @Output() onAddElement = new EventEmitter<IOutputEvent>();
   @Output() onClickElement = new EventEmitter<IOutputClickEvent>();
@@ -114,7 +116,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
   private readonly minElementSize = 5;
 
-  private newElement: IElement = this.emptyElement;
+  private activeElement: IElement = this.emptyElement;
   private elements: IElement[] = [];
 
   private mouseEnterElementIndex: number = -1;
@@ -155,6 +157,15 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     };
 	};
 
+  get defaultGridConfig(): IDrawGridConfig {
+    return {
+      enabled: true,
+      cellSize: 12,
+      strokeWidth: .3,
+      strokeColor: '#000000'
+    }
+  };
+
   private subscriptions = new Subscription();
 
   constructor(
@@ -194,10 +205,10 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
   };
 
   /**
-  * Init newElement and canvas properties, draw initial elements, grid, set event listeners
+  * Init activeElement and canvas properties, draw initial elements, grid, set event listeners
   */
   ngAfterViewInit(): void {
-    this.newElement = this.emptyElement;
+    this.activeElement = this.emptyElement;
     this.canvas = this.canvasEl?.nativeElement;
     this.canvasBackground = this.canvasBackgroundEl?.nativeElement;
 
@@ -260,11 +271,17 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     e.stopPropagation();
 
 		this.mouseIsDown = false;
+    const step = this.gridConfig.cellSize || this.defaultGridConfig.cellSize;
 
     // end of resizing
 		if (this.resizableElementIndex >= 0) {
 			let targetEl = this.elements[this.resizableElementIndex]
 			this.elements[this.resizableElementIndex] = convertElementNegativeProps(targetEl);
+
+      if (this.gridSizeMouseStep) {
+        ensureGridStep(this.elements[this.resizableElementIndex], step);
+      }
+
       this.zone.run(() => {
         this.onResizeEnd.emit(this.getOutputParams(this.resizableElementIndex));
         this.resizeStarted = false;
@@ -273,6 +290,11 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
     // end of dragging
     if (this.draggableElementIndex >= 0) {
+
+      if (this.gridSizeMouseStep) {
+        ensureGridStep(this.elements[this.draggableElementIndex], step);
+      }
+
       this.zone.run(() => {
         if (this.dragStarted) {
           this.onDragEnd.emit(this.getOutputParams(this.draggableElementIndex));
@@ -283,7 +305,12 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
     // end of drawing
 		if (this.draggableElementIndex < 0 && this.resizableElementIndex < 0) {
-			const newElem = convertElementNegativeProps({ ...this.newElement });
+			const newElem = convertElementNegativeProps({ ...this.activeElement });
+
+      if (this.gridSizeMouseStep) {
+        ensureGridStep(newElem, step);
+      }
+
 			if (newElem.width > this.minElementSize && newElem.height > this.minElementSize) {
 				this.elements.push(newElem);
         this.zone.run(() => {
@@ -291,7 +318,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
         });
 			}
 		}
-    this.newElement = this.emptyElement;
+    this.activeElement = this.emptyElement;
     this.drawElements();
 	};
 
@@ -304,8 +331,8 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     e.stopPropagation();
 
     const { x, y } = this.getMouseCoords(e);
-		this.newElement.x = x;
-		this.newElement.y = y;
+		this.activeElement.x = x;
+		this.activeElement.y = y;
 		this.mouseIsDown = true;
     if (this.draggableElementIndex >= 0) {
 
@@ -356,8 +383,8 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
     ensureFieldBordersOnResize(this.mouseCoords, this.canvasWidth$.value, this.canvasHeight$.value);
 
-    this.newElement.width = this.mouseCoords.x - this.newElement.x;
-    this.newElement.height = this.mouseCoords.y - this.newElement.y;
+    this.activeElement.width = this.mouseCoords.x - this.activeElement.x;
+    this.activeElement.height = this.mouseCoords.y - this.activeElement.y;
 
     // resize existing element
     if (this.resizableElementIndex >= 0) {
@@ -379,7 +406,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
     }
     // drag existing element
     else if (this.draggableElementIndex >= 0) {
-      const { width, height } = this.newElement;
+      const { width, height } = this.activeElement;
 
       if (
         (width === 0 && height === 0) ||
@@ -410,12 +437,12 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
 
       this.drawElements();
 
-      this.newElement.x = this.mouseCoords.x;
-      this.newElement.y = this.mouseCoords.y;
+      this.activeElement.x = this.mouseCoords.x;
+      this.activeElement.y = this.mouseCoords.y;
     }
     // draw new element
     else {
-      const newElementProps = { ctx: this.ctx, elem: this.newElement };
+      const newElementProps = { ctx: this.ctx, elem: this.activeElement };
       this.drawElements();
       this.drawElement(newElementProps);
     }
@@ -472,14 +499,7 @@ export class NgxDrawingBoard implements OnInit, AfterViewInit, OnChanges, OnDest
    * Draw canvas grid
    */
   drawCanvasGrid = (): void => {
-    const defaultGridConfig: IDrawGridConfig = {
-      enabled: true,
-      cellSize: 12,
-      strokeWidth: .3,
-      strokeColor: '#000000'
-    };
-
-    const gridConfig = Object.assign(defaultGridConfig, this.gridConfig);
+    const gridConfig = Object.assign(this.defaultGridConfig, this.gridConfig);
 
     if (!gridConfig.enabled) {
       return;

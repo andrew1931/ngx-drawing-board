@@ -56,6 +56,7 @@ export class SomeModule {}
 | initialElementColor | string      | "transparent"     | no       | Drawing element initial color                           |
 | gridConfig          | IGridConfig | { enabled: true } | no       | Settings for canvas background grid                     |
 | fitCanvasToImage    | boolean     | true              | no       | Makes canvas the same size as provided background image |
+| gridSizeMouseStep   | boolean     | false             | no       | Equals mouse step while drawing to grid size            |
 
 ### Outputs
 | Output                | Arguments         | Description                                     |
