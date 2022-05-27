@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { NgxDrawingBoard } from './ngx-drawing-board';
-import { Rectangle, Ellipse, Triangle, Image, BaseShape } from './shapes';
+import { RectangleShape, EllipseShape, TriangleShape, ImageShape } from './shapes';
+import { Renderer } from './renderer';
 
 
 @NgModule({
@@ -9,11 +10,11 @@ import { Rectangle, Ellipse, Triangle, Image, BaseShape } from './shapes';
   exports: [ NgxDrawingBoard ],
   imports: [ CommonModule ],
   providers: [
-    BaseShape,
-    Rectangle,
-    Ellipse,
-    Triangle,
-    Image
+    Renderer,
+    RectangleShape,
+    EllipseShape,
+    TriangleShape,
+    ImageShape
   ]
 })
 export class NgxDrawingBoardModule {}

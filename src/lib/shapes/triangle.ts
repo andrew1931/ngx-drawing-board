@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
 import { IDrawElement } from '../types';
-import { BaseShape } from './base';
+import { Renderer } from '../renderer';
 
 @Injectable()
-export class Triangle extends BaseShape {
+export class TriangleShape {
 
-  override drawElement(props: IDrawElement): void {
-    if (props.ctx === null) {
+  constructor(
+    private renderer: Renderer
+  ) {}
+
+  drawElement(props: IDrawElement): void {
+    if (this.renderer.ctx === null) {
       return;
     }
 
@@ -14,16 +18,16 @@ export class Triangle extends BaseShape {
     const mouseX = width + x;
     const mouseY = height + y;
 
-    props.ctx.setLineDash([]);
-    props.ctx.beginPath();
-    props.ctx.lineWidth = 1;
-    props.ctx.moveTo(x + (mouseX - x) / 2, y);
-    props.ctx.lineTo(x, mouseY);
-    props.ctx.lineTo(mouseX, mouseY);
-    props.ctx.lineTo(x + (mouseX - x) / 2, y);
-    props.ctx.closePath();
+    this.renderer.ctx.setLineDash([]);
+    this.renderer.ctx.beginPath();
+    this.renderer.ctx.lineWidth = 1;
+    this.renderer.ctx.moveTo(x + (mouseX - x) / 2, y);
+    this.renderer.ctx.lineTo(x, mouseY);
+    this.renderer.ctx.lineTo(mouseX, mouseY);
+    this.renderer.ctx.lineTo(x + (mouseX - x) / 2, y);
+    this.renderer.ctx.closePath();
 
-    super.drawElement(props);
+    this.renderer.drawElement(props);
   };
 
 }

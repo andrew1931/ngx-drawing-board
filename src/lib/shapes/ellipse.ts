@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
 import { IDrawElement } from '../types';
-import { BaseShape } from './base';
+import { Renderer } from '../renderer';
 
 @Injectable()
-export class Ellipse extends BaseShape {
+export class EllipseShape {
 
-  override drawElement(props: IDrawElement): void {
-    if (props.ctx === null) {
+  constructor(
+    private renderer: Renderer
+  ) {}
+
+  drawElement(props: IDrawElement): void {
+    if (this.renderer.ctx === null) {
       return;
     }
 
@@ -18,14 +22,14 @@ export class Ellipse extends BaseShape {
     const centerX = (x / scaleX) + 1;
     const centerY = (y / scaleY) + 1;
 
-    props.ctx.setLineDash([]);
-    props.ctx.save();
-		props.ctx.beginPath();
-    props.ctx.scale(scaleX ,scaleY);
-    props.ctx.arc(centerX, centerY, 1, 0, 2 * Math.PI);
-    props.ctx.restore();
+    this.renderer.ctx.setLineDash([]);
+    this.renderer.ctx.save();
+    this.renderer.ctx.beginPath();
+    this.renderer.ctx.scale(scaleX ,scaleY);
+    this.renderer.ctx.arc(centerX, centerY, 1, 0, 2 * Math.PI);
+    this.renderer.ctx.restore();
 
-    super.drawElement(props);
+    this.renderer.drawElement(props);
 	};
 
 }

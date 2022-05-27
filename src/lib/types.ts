@@ -26,15 +26,8 @@ export interface IElementBorder {
 }
 
 export interface IDrawElement {
-	ctx: CanvasRenderingContext2D | null,
 	elem: IElement,
 	fill?: boolean,
-	isHovered?: boolean,
-}
-
-export interface IDrawHandle {
-	ctx: CanvasRenderingContext2D | null,
-	elem: IElement,
 }
 
 export interface IDrawLine {

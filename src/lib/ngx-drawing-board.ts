@@ -20,12 +20,12 @@ import {
   map,
   Subscription
 } from 'rxjs';
+import { Renderer } from './renderer';
 import {
-  Rectangle,
-  Ellipse,
-  Triangle,
-  Image,
-  BaseShape
+  RectangleShape,
+  EllipseShape,
+  TriangleShape,
+  ImageShape,
 } from './shapes';
 import {
   IElement,
@@ -111,9 +111,6 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
   public canvasHeight$: BehaviorSubject<number> = new BehaviorSubject(0);
   public canvasBackground$: BehaviorSubject<string> = new BehaviorSubject('');
 
-  private canvasBackground: HTMLCanvasElement | undefined;
-  private canvas: HTMLCanvasElement | undefined;
-
   private readonly minElementSize = 5;
 
   private activeElement: IElement = this.emptyElement;
@@ -130,21 +127,7 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
 	private shadowOnHoveredElement: boolean = false;
   private currentHandle: EMouseHandle | false = false;
 
-  get ctxBackground(): CanvasRenderingContext2D | null {
-    return this.canvasBackground ? this.canvasBackground.getContext('2d') : null;
-  };
-
-  get ctx(): CanvasRenderingContext2D | null {
-		return this.canvas ? this.canvas.getContext('2d') : null;
-	};
-
-	get canvasX(): number {
-		return this.canvas?.getBoundingClientRect()?.left || 0;
-	};
-
-	get canvasY(): number {
-		return this.canvas?.getBoundingClientRect()?.top || 0;
-	};
+  private canvasOffsets: IPoint = { x: 0, y: 0 };
 
 	get emptyElement(): IElement {
     return {
@@ -170,18 +153,18 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
 
   constructor(
     private readonly zone: NgZone,
-    private baseShape: BaseShape,
-    private rectangle: Rectangle,
-    private ellipse: Ellipse,
-    private triangle: Triangle,
-    private image: Image
+    private renderer: Renderer,
+    private rectangle: RectangleShape,
+    private ellipse: EllipseShape,
+    private triangle: TriangleShape,
+    private image: ImageShape
   ) {}
 
   /**
   * Re-draw all elements when `this.elements` list changes
   */
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.canvas) {
+    if (this.renderer.ctx !== null) {
       if (changes.gridConfig) {
         this.drawElements();
         this.drawCanvasGrid();
@@ -205,18 +188,25 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
   };
 
   /**
-  * Init activeElement and canvas properties, draw initial elements, grid, set event listeners
+  * Init activeElement, canvas properties and render contexts; draw initial elements and grid; set event listeners
   */
   ngAfterViewInit(): void {
-    this.activeElement = this.emptyElement;
-    this.canvas = this.canvasEl?.nativeElement;
-    this.canvasBackground = this.canvasBackgroundEl?.nativeElement;
+    if (this.canvasEl && this.canvasBackgroundEl) {
 
-    this.drawElements();
+      const { top, left } = this.canvasEl?.nativeElement.getBoundingClientRect();
+      this.canvasOffsets.x = left;
+      this.canvasOffsets.y = top;
 
-    this.drawCanvasGrid();
+      this.renderer.initRenderContexts(this.canvasEl.nativeElement, this.canvasBackgroundEl.nativeElement);
 
-    this.initEventsSubscriptions();
+      this.activeElement = this.emptyElement;
+
+      this.drawElements();
+
+      this.drawCanvasGrid();
+
+      this.initEventsSubscriptions();
+    }
   };
 
   /**
@@ -230,9 +220,9 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
   * Init mousedown, mouseup, mousemove event listeners
   */
   private initEventsSubscriptions(): void {
-    if (!this.canvas) { return }
-    const canvasMouseDown$ = fromEvent(this.canvas, 'mousedown');
-    const canvasMouseMove$ = fromEvent(this.canvas, 'mousemove');
+    if (!this.canvasEl) { return }
+    const canvasMouseDown$ = fromEvent(this.canvasEl.nativeElement, 'mousedown');
+    const canvasMouseMove$ = fromEvent(this.canvasEl.nativeElement, 'mousemove');
     const windowMouseMove$ = fromEvent(window, 'mousemove');
     const windowMouseUp$ = fromEvent(window, 'mouseup');
 
@@ -442,7 +432,7 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
     }
     // draw new element
     else {
-      const newElementProps = { ctx: this.ctx, elem: this.activeElement };
+      const newElementProps = { elem: this.activeElement };
       this.drawElements();
       this.drawElement(newElementProps);
     }
@@ -452,20 +442,18 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
   * Draw all elements from `this.elements` list
   */
 	drawElements = (): void => {
-		this.baseShape.clearField(this.ctx, this.canvasWidth$.value, this.canvasHeight$.value);
+		this.renderer.clearField(this.canvasWidth$.value, this.canvasHeight$.value);
 
 		for (let [index, elem] of this.elements.entries()) {
       const drawProps = {
-        ctx: this.ctx,
         elem,
         fill: true,
-        isHovered: this.draggableElementIndex === index
       };
 
       this.drawElement(drawProps);
 
-      if (index === this.selectedElementIndex) {
-        this.baseShape.drawHandles({ ctx: this.ctx, elem });
+      if (index === this.selectedElementIndex || index === this.draggableElementIndex) {
+        this.renderer.drawHandles(elem);
       }
 		}
   };
@@ -505,8 +493,7 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
       return;
     }
 
-    this.baseShape.drawGrid(
-      this.ctxBackground,
+    this.renderer.drawGrid(
       gridConfig,
       this.canvasWidth$.value,
       this.canvasHeight$.value
@@ -532,7 +519,7 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
       let mouseIsOverElement = false;
 
       mouseIsOverElement = detectIfMouseIsOverElement(mouseCoords, elem);
-      this.currentHandle = detectCurrentHandle(mouseCoords, elem);
+      this.currentHandle = detectCurrentHandle(mouseCoords, elem, this.renderer.handle.defaultSize);
       if (this.currentHandle) {
         this.resizableElementIndex = index;
         this.draggableElementIndex = -1;
@@ -607,8 +594,8 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
    */
   getMouseCoords(e: MouseEvent): IPoint {
     return {
-      x: e.clientX - this.canvasX,
-      y: e.clientY - this.canvasY
+      x: e.clientX - this.canvasOffsets.x,
+      y: e.clientY - this.canvasOffsets.y
     }
   };
 

@@ -1,23 +1,27 @@
 import { Injectable } from '@angular/core';
 import { IDrawElement } from '../types';
-import { BaseShape } from './base';
+import { Renderer } from '../renderer';
 
 @Injectable()
-export class Image extends BaseShape {
+export class ImageShape {
 
-  override drawElement(props: IDrawElement): void {
-    if (props.ctx === null) {
+  constructor(
+    private renderer: Renderer
+  ) {}
+
+  drawElement(props: IDrawElement): void {
+    if (this.renderer.ctx === null) {
       return;
     }
     const { x, y, width, height, imageSrc } = props.elem;
 
     if (imageSrc) {
-      props.ctx.setLineDash([]);
-      props.ctx.beginPath();
-      props.ctx.drawImage(imageSrc, x, y, width, height);
+      this.renderer.ctx.setLineDash([]);
+      this.renderer.ctx.beginPath();
+      this.renderer.ctx.drawImage(imageSrc, x, y, width, height);
     }
 
-    super.drawElement(props);
+    this.renderer.drawElement(props);
 	};
 
 }

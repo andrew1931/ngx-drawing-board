@@ -1,20 +1,24 @@
 import { Injectable } from '@angular/core';
 import { IDrawElement } from '../types';
-import { BaseShape } from './base';
+import { Renderer } from '../renderer';
 
 @Injectable()
-export class Rectangle extends BaseShape {
+export class RectangleShape {
 
-  override drawElement(props: IDrawElement): void {
-    if (props.ctx === null) {
+  constructor(
+    private renderer: Renderer
+  ) {}
+
+  drawElement(props: IDrawElement): void {
+    if (this.renderer.ctx === null) {
       return;
     }
 
-    props.ctx.setLineDash([]);
-    props.ctx.beginPath();
-    props.ctx.rect(props.elem.x, props.elem.y, props.elem.width, props.elem.height);
+    this.renderer.ctx.setLineDash([]);
+    this.renderer.ctx.beginPath();
+    this.renderer.ctx.rect(props.elem.x, props.elem.y, props.elem.width, props.elem.height);
 
-    super.drawElement(props);
+    this.renderer.drawElement(props);
 	};
 
 }
