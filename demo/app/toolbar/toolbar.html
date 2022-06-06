@@ -1,0 +1,82 @@
+<div class="toolbar-container">
+
+  <h4>Toolbar</h4>
+  <div class="toolbar-wrapper">
+    <button
+      [class.active]="activeShape === button.value"
+      *ngFor="let button of shapeButtons"
+      (click)="selectShape.emit(button.value)"
+    >
+      <img class="icon" [src]="'assets/icons/' + button.icon + '.png'" />
+    </button>
+  </div>
+
+  <h4>Canvas</h4>
+  <div>
+    <label>
+      <span>Width</span>
+      <input
+        [disabled]="canvas?.backgroundImage && fitCanvasToImage"
+        type="number"
+        [value]="canvas?.width"
+        (input)="setSize.emit({ target: 'width', input: $event.target })"
+      >
+    </label>
+    <label>
+      <span>Height</span>
+      <input
+        [disabled]="canvas?.backgroundImage && fitCanvasToImage"
+        type="number"
+        [value]="canvas?.height"
+        (input)="setSize.emit({ target: 'height', input: $event.target })"
+      >
+    </label>
+    <label>
+      <span>Background color</span>
+      <input type="color" [value]="canvas?.backgroundColor" (input)="setBackgroundColor.emit($event)">
+    </label>
+    <label class="background-image-label">
+      <button class="background-image-btn">Background image</button>
+      <input type="file" (input)="setBackgroundImage.emit($event)">
+    </label>
+    <button
+      *ngIf="canvas?.backgroundImage"
+      class="background-image-btn"
+      (click)="removeBackgroundImage.emit()"
+    >Remove image</button>
+    <label class="row">
+      <input type="checkbox" [checked]="fitCanvasToImage" (change)="toggleFitCanvasToImage.emit()">
+      <span>Fit canvas to image</span>
+    </label>
+  </div>
+
+  <h4>Grid</h4>
+  <div>
+    <label class="row">
+      <input type="checkbox" [checked]="gridConfig?.enabled" (change)="toggleGrid.emit()">
+      <span>Show Grid</span>
+    </label>
+
+    <label>
+      <span>Grid Color</span>
+      <input type="color" [value]="gridConfig?.strokeColor" (input)="setGridColor.emit($event)">
+    </label>
+
+    <label>
+      <span>Cell Size</span>
+      <input type="number" min="1" [value]="gridConfig?.cellSize" (input)="setGridCellSize.emit($event)">
+    </label>
+
+    <label>
+      <span>Grid Line Width</span>
+      <input type="number" min="0" [value]="gridConfig?.strokeWidth" (input)="setGridLineWidth.emit($event)">
+    </label>
+  </div>
+
+
+  <h4>Mouse step</h4>
+  <label class="row">
+    <input type="checkbox" [checked]="gridSizeMouseStep" (change)="toggleGridSizeMouseStep.emit()">
+    <span>Grid Size Mouse Step</span>
+  </label>
+</div>

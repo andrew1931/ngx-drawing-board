@@ -1,0 +1,86 @@
+.toolbar-container {
+  margin-right: 2rem;
+  position: relative;
+}
+
+.toolbar-wrapper {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.toolbar-wrapper button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 3px;
+  height: 32px;
+  width: 32px;
+  padding: 0;
+  border: none;
+}
+
+.toolbar-wrapper button .icon {
+  width: 80%;
+  height: 80%;
+}
+
+.toolbar-wrapper button.active {
+  background: cornflowerblue;
+  color: #ffffff;
+}
+
+.toolbar-container label {
+  cursor: pointer;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.toolbar-container label.row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.toolbar-container label.row span {
+  margin-left: 5px;
+}
+
+.toolbar-container label span {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+
+h4 {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: .5rem;
+  margin-top: 0;
+}
+
+.toolbar-container label input[type=color] {
+  width: 100%;
+  cursor: pointer;
+}
+
+.background-image-label {
+  position: relative;
+}
+
+.background-image-label input,
+.background-image-label input::-webkit-file-upload-button
+{
+  cursor: pointer;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}
+
+.background-image-btn {
+  width: 100%;
+}

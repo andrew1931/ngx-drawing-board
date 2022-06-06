@@ -1,0 +1,35 @@
+<div class="demo-wrapper">
+
+  <app-toolbar
+    [canvas]="canvas"
+    [activeShape]="activeShape"
+    [gridConfig]="gridConfig"
+    [gridSizeMouseStep]="gridSizeMouseStep"
+    [fitCanvasToImage]="fitCanvasToImage"
+    (selectShape)="selectShape($event)"
+    (toggleGrid)="toggleGrid()"
+    (setGridColor)="setGridColor($event)"
+    (setGridLineWidth)="setGridLineWidth($event)"
+    (setGridCellSize)="setGridCellSize($event)"
+    (toggleGridSizeMouseStep)="toggleGridSizeMouseStep()"
+    (setSize)="setSize($event)"
+    (setBackgroundColor)="setBackgroundColor($event)"
+    (setBackgroundImage)="setBackgroundImage($event)"
+    (removeBackgroundImage)="removeBackgroundImage()"
+    (toggleFitCanvasToImage)="toggleFitCanvasToImage()"
+  ></app-toolbar>
+
+  <div class="board-wrapper">
+    <ngx-drawing-board
+      [width]="canvas.width"
+      [height]="canvas.height"
+      [backgroundColor]="canvas.backgroundColor"
+      [backgroundImage]="canvas.backgroundImage"
+      [fitCanvasToImage]="fitCanvasToImage"
+      [shape]="activeShape"
+      [gridConfig]="gridConfig"
+      [gridSizeMouseStep]="gridSizeMouseStep"
+    ></ngx-drawing-board>
+  </div>
+
+</div>
