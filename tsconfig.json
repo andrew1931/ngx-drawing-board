@@ -12,7 +12,7 @@
     "sourceMap": true,
     "paths": {
       "ngx-drawing-board": [
-        "dist/",
+        "dist/ngx-drawing-board",
       ]
     },
     "declaration": false,

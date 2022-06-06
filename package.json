@@ -6,13 +6,18 @@
   },
   "scripts": {
     "ng": "ng",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development"
+    "watch": "ng build --watch --configuration development",
+    "start": "ng serve demo",
+    "build": "ng build ngx-drawing-board",
+    "build:demo": "ng build demo --configuration production --baseHref=/ngx-drawing-board"
   },
   "dependencies": {
+    "@angular/animations": "~13.3.0",
+    "@angular/cdk": "^13.3.8",
     "@angular/common": "~13.3.0",
     "@angular/compiler": "~13.3.0",
     "@angular/core": "~13.3.0",
+    "@angular/forms": "~13.3.0",
     "@angular/platform-browser": "~13.3.0",
     "@angular/platform-browser-dynamic": "~13.3.0",
     "rxjs": "~7.5.0",

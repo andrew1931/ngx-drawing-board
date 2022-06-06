@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/ng-packagr/ng-package.schema.json",
-  "dest": "../dist",
+  "dest": "../dist/ngx-drawing-board",
   "lib": {
     "entryFile": "./public-api.ts"
   }

@@ -50,23 +50,27 @@ import {
   setCursorType,
   isTriangle,
   isImage,
-  ensureGridStep
+  ensureGridStep,
+  validate
 } from './utils';
 
 
 @Component({
   selector: 'ngx-drawing-board',
   template: `
-    <div [style.position]="'relative'">
+    <div
+      [style.position]="'relative'"
+      [style.width.px]="canvasWidth$ | async"
+      [style.height.px]="canvasHeight$ | async"
+      [style.background]="canvasBackground$ | async"
+    >
       <canvas
         #canvasBackground
-        [style.background]="canvasBackground$ | async"
         [width]="canvasWidth$ | async"
         [height]="canvasHeight$ | async"
       ></canvas>
       <canvas
         #canvas
-        [style.background]="'transparent'"
         [width]="canvasWidth$ | async"
         [height]="canvasHeight$ | async"
       ></canvas>
@@ -107,9 +111,10 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
   @ViewChild('canvasBackground') canvasBackgroundEl: ElementRef<HTMLCanvasElement> | undefined;
   @ViewChild('canvas') canvasEl: ElementRef<HTMLCanvasElement> | undefined;
 
-  public canvasWidth$: BehaviorSubject<number> = new BehaviorSubject(0);
-  public canvasHeight$: BehaviorSubject<number> = new BehaviorSubject(0);
-  public canvasBackground$: BehaviorSubject<string> = new BehaviorSubject('');
+  public canvasWidth$ = new BehaviorSubject<number>(0);
+  public canvasHeight$ = new BehaviorSubject<number>(0);
+  public canvasBackground$ = new BehaviorSubject<string>('');
+  private _canvasSize$ = new BehaviorSubject<{ width?: number, height?: number } | null>(null);
 
   private readonly minElementSize = 5;
 
@@ -161,12 +166,19 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
   ) {}
 
   /**
-  * Re-draw all elements when `this.elements` list changes
-  */
+   * Re-draw all elements when `this.elements` list changes
+   */
   ngOnChanges(changes: SimpleChanges): void {
     if (this.renderer.ctx !== null) {
+      if (changes.width || changes.height) {
+        this._canvasSize$.next({});
+      }
+
+      if (changes.backgroundColor || changes.backgroundImage || changes.fitCanvasToImage) {
+        this.setCanvasBackground();
+      }
+
       if (changes.gridConfig) {
-        this.drawElements();
         this.drawCanvasGrid();
       }
 
@@ -174,26 +186,61 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
         this.elements = [...changes.data.currentValue];
         this.drawElements();
       }
+
+      if (changes.shape) {
+        this.activeElement.shape = this.shape;
+      }
+
+      if (changes.initialElementColor) {
+        this.activeElement.color = this.initialElementColor;
+      }
     }
   };
 
   /**
-  * Init canvas size and background
-  */
+   * Init canvas size and background
+   */
   ngOnInit(): void {
     if (this.data) {
       this.elements = [...this.data];
     }
-    this.setCanvasSizeAndBackground();
+    this.subscriptions.add(
+      this._canvasSize$.subscribe((val) => {
+        if (val) {
+          this.setCanvasSize(val.width, val.height);
+          setTimeout(() => {
+            this.initCanvasProps();
+          }, 0)
+        }
+
+      })
+    );
+
+    this.setCanvasBackground();
   };
 
   /**
-  * Init activeElement, canvas properties and render contexts; draw initial elements and grid; set event listeners
-  */
+   *  Init canvas props; set event listeners
+   */
   ngAfterViewInit(): void {
+    this.initEventsSubscriptions();
+  };
+
+  /**
+   * Remove event listeners
+   */
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  };
+
+  /**
+   * Init activeElement, canvas properties and render contexts; draw initial elements and grid;
+   */
+  private initCanvasProps(): void {
     if (this.canvasEl && this.canvasBackgroundEl) {
 
       const { top, left } = this.canvasEl?.nativeElement.getBoundingClientRect();
+
       this.canvasOffsets.x = left;
       this.canvasOffsets.y = top;
 
@@ -205,26 +252,20 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
 
       this.drawCanvasGrid();
 
-      this.initEventsSubscriptions();
     }
-  };
+  }
 
   /**
-  * Remove event listeners
-  */
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
-  };
-
-  /**
-  * Init mousedown, mouseup, mousemove event listeners
-  */
+   * Init mousedown, mouseup, mousemove event listeners
+   */
   private initEventsSubscriptions(): void {
     if (!this.canvasEl) { return }
+
     const canvasMouseDown$ = fromEvent(this.canvasEl.nativeElement, 'mousedown');
     const canvasMouseMove$ = fromEvent(this.canvasEl.nativeElement, 'mousemove');
     const windowMouseMove$ = fromEvent(window, 'mousemove');
     const windowMouseUp$ = fromEvent(window, 'mouseup');
+
 
     this.zone.runOutsideAngular(() => {
       this.subscriptions.add(
@@ -254,11 +295,18 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
   }
 
   /**
-  * Handle canvas mouse up
-  */
+   *  Handle canvas mouse up
+   */
 	mouseUpListener = (e: MouseEvent): void => {
-    e.preventDefault();
-    e.stopPropagation();
+
+    if (
+      this.resizableElementIndex < 0 &&
+      this.draggableElementIndex < 0 &&
+      this.activeElement.width === 0 &&
+      this.activeElement.height === 0
+    ) {
+      return;
+    }
 
 		this.mouseIsDown = false;
     const step = this.gridConfig.cellSize || this.defaultGridConfig.cellSize;
@@ -308,6 +356,7 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
         });
 			}
 		}
+
     this.activeElement = this.emptyElement;
     this.drawElements();
 	};
@@ -317,8 +366,6 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
    * @param e
    */
 	mouseDownListener = (e: MouseEvent): void => {
-    e.preventDefault();
-    e.stopPropagation();
 
     const { x, y } = this.getMouseCoords(e);
 		this.activeElement.x = x;
@@ -365,9 +412,6 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
     if (!this.mouseIsDown) {
       return;
 	  }
-
-    e.preventDefault();
-    e.stopPropagation();
 
     this.mouseCoords = this.getMouseCoords(e);
 
@@ -459,8 +503,8 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
   };
 
   /**
-  * Draw new element
-  */
+   * Draw new element
+   */
   drawElement = (props: IDrawElement): void => {
     if (isImage(props.elem)) {
       this.image.drawElement(props);
@@ -487,6 +531,10 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
    * Draw canvas grid
    */
   drawCanvasGrid = (): void => {
+    this.renderer.clearBackgroundField(this.canvasWidth$.value, this.canvasHeight$.value);
+
+    this.renderer.toggleBackgroundFieldTranslate();
+
     const gridConfig = Object.assign(this.defaultGridConfig, this.gridConfig);
 
     if (!gridConfig.enabled) {
@@ -556,30 +604,42 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
   };
 
   /**
-  * Set initial canvas size and background
-  */
-  setCanvasSizeAndBackground(): void {
-    this.canvasWidth$.next(this.width);
-    this.canvasHeight$.next(this.height);
+   * Set initial canvas size
+   */
+  setCanvasSize(width?: number, height?: number): void {
+    const _width = width || this.width;
+    const _height = height || this.height;
 
+    validate.size(_width, _height);
+
+    this.canvasWidth$.next(_width);
+    this.canvasHeight$.next(_height);
+  };
+
+  /**
+   * Set initial canvas background
+   */
+  setCanvasBackground(): void {
     if (this.backgroundImage) {
       this.canvasBackground$.next('url('+ this.backgroundImage +')');
 
       if (this.fitCanvasToImage) {
-        const background: any = new Image();
+        const background = new Image();
         background.src = this.backgroundImage;
         background.onload = () => {
-          this.canvasWidth$.next( background.width);
-          this.canvasHeight$.next(background.height);
-        }
+          this._canvasSize$.next({ width: background.width, height: background.height });
+        };
+      } else {
+        this._canvasSize$.next({});
       }
     } else {
       this.canvasBackground$.next(this.backgroundColor);
+      this._canvasSize$.next({});
     }
   };
 
   /**
-  * Returns params for output event
+   * Returns params for output event
    * @param targetIndex
    */
   getOutputParams(targetIndex: number): IOutputEvent {
@@ -593,9 +653,13 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
    * Returns coordinates of a mouse
    */
   getMouseCoords(e: MouseEvent): IPoint {
+
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft ||  document.body.scrollLeft;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop ||  document.body.scrollTop;
+
     return {
-      x: e.clientX - this.canvasOffsets.x,
-      y: e.clientY - this.canvasOffsets.y
+      x: e.clientX - this.canvasOffsets.x + Number(scrollLeft),
+      y: e.clientY - this.canvasOffsets.y + Number(scrollTop)
     }
   };
 

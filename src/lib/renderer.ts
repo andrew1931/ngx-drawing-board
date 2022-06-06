@@ -1,5 +1,5 @@
 import { EMouseHandle, IDrawElement, IDrawGridConfig, IDrawLine, IElement } from './types';
-import { getHandlePosition, isImage } from './utils';
+import { getHandlePosition, isImage, validate } from './utils';
 import { Injectable } from '@angular/core';
 
 
@@ -131,12 +131,29 @@ export class Renderer {
     }
   };
 
+  // Anti-aliasing fix. This makes the lines look crisp and sharp
+  public toggleBackgroundFieldTranslate(): void {
+    if (this._ctxBackground) {
+      const TRANSLATE_VALUE = 0.5;
+      const { e, f } = this._ctxBackground.getTransform();
+      if (e === TRANSLATE_VALUE && f === TRANSLATE_VALUE) {
+        this._ctxBackground.translate(TRANSLATE_VALUE * -1, TRANSLATE_VALUE * -1);
+      }
+
+      this._ctxBackground.translate(TRANSLATE_VALUE, TRANSLATE_VALUE);
+    }
+  };
+
+  public clearBackgroundField(width: number, height: number): void {
+    if (this._ctxBackground) {
+      this._ctxBackground.clearRect(0, 0, width, height);
+    }
+  };
+
   public drawGrid(gridConfig: IDrawGridConfig, width: number, height: number): void {
     if (this._ctxBackground === null) {
       return;
     }
-    // Anti-aliasing fix. This makes the lines look crisp and sharp
-    this._ctxBackground.translate(0.5, 0.5);
 
     const drawLine = ({ startX, startY, endX, endY }: IDrawLine): void => {
       if (this._ctxBackground === null) {
@@ -152,6 +169,9 @@ export class Renderer {
     }
 
     const { cellSize, strokeColor, strokeWidth } = gridConfig;
+
+    validate.grid(gridConfig);
+
     let currentY = 0;
     while (currentY < height) {
       drawLine({
