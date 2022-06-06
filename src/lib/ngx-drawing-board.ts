@@ -297,7 +297,9 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
   /**
    *  Handle canvas mouse up
    */
-	mouseUpListener = (e: MouseEvent): void => {
+	mouseUpListener = (): void => {
+
+    this.mouseIsDown = false;
 
     if (
       this.resizableElementIndex < 0 &&
@@ -308,7 +310,6 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
       return;
     }
 
-		this.mouseIsDown = false;
     const step = this.gridConfig.cellSize || this.defaultGridConfig.cellSize;
 
     // end of resizing
