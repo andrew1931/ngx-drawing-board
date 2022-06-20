@@ -57,6 +57,7 @@ export class SomeModule {}
 | gridConfig          | IGridConfig | { enabled: true } | no       | Settings for canvas background grid                     |
 | fitCanvasToImage    | boolean     | true              | no       | Makes canvas the same size as provided background image |
 | gridSizeMouseStep   | boolean     | false             | no       | Equals mouse step while drawing to grid size            |
+| scrollContainer     | HTMLElement | undefined         | no       | Container inside which board is scrolling               |
 
 ### Outputs
 | Output                | Arguments         | Description                                     |

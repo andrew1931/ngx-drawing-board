@@ -93,6 +93,7 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
   @Input() fitCanvasToImage: boolean = true;
   @Input() gridConfig: IGridConfig = { enabled: true };
   @Input() gridSizeMouseStep: boolean = false;
+  @Input() scrollContainer: HTMLElement | undefined;
 
   @Output() onAddElement = new EventEmitter<IOutputEvent>();
   @Output() onClickElement = new EventEmitter<IOutputClickEvent>();
@@ -261,6 +262,7 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
   private initEventsSubscriptions(): void {
     if (!this.canvasEl) { return }
 
+    const canvasMouseRightClick$ = fromEvent(this.canvasEl.nativeElement, 'contextmenu');
     const canvasMouseDown$ = fromEvent(this.canvasEl.nativeElement, 'mousedown');
     const canvasMouseMove$ = fromEvent(this.canvasEl.nativeElement, 'mousemove');
     const windowMouseMove$ = fromEvent(window, 'mousemove');
@@ -268,6 +270,10 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
 
 
     this.zone.runOutsideAngular(() => {
+      this.subscriptions.add(
+        canvasMouseRightClick$.subscribe((e: any) => e.preventDefault())
+      );
+
       this.subscriptions.add(
         canvasMouseDown$.pipe(map((e: any) => e)).subscribe(this.mouseDownListener)
       );
@@ -655,8 +661,8 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
    */
   getMouseCoords(e: MouseEvent): IPoint {
 
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft ||  document.body.scrollLeft;
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop ||  document.body.scrollTop;
+    const scrollLeft = this.scrollContainer?.scrollLeft || document.documentElement.scrollLeft ||  document.body.scrollLeft;
+    const scrollTop = this.scrollContainer?.scrollTop || document.documentElement.scrollTop ||  document.body.scrollTop;
 
     return {
       x: e.clientX - this.canvasOffsets.x + Number(scrollLeft),
