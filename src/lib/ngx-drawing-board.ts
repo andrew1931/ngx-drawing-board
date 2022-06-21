@@ -93,7 +93,6 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
   @Input() fitCanvasToImage: boolean = true;
   @Input() gridConfig: IGridConfig = { enabled: true };
   @Input() gridSizeMouseStep: boolean = false;
-  @Input() scrollContainer: HTMLElement | undefined;
 
   @Output() onAddElement = new EventEmitter<IOutputEvent>();
   @Output() onClickElement = new EventEmitter<IOutputClickEvent>();
@@ -132,8 +131,6 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
   private resizeStarted: boolean = false;
 	private shadowOnHoveredElement: boolean = false;
   private currentHandle: EMouseHandle | false = false;
-
-  private canvasOffsets: IPoint = { x: 0, y: 0 };
 
 	get emptyElement(): IElement {
     return {
@@ -239,11 +236,6 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
    */
   private initCanvasProps(): void {
     if (this.canvasEl && this.canvasBackgroundEl) {
-
-      const { top, left } = this.canvasEl?.nativeElement.getBoundingClientRect();
-
-      this.canvasOffsets.x = left;
-      this.canvasOffsets.y = top;
 
       this.renderer.initRenderContexts(this.canvasEl.nativeElement, this.canvasBackgroundEl.nativeElement);
 
@@ -660,13 +652,17 @@ export class NgxDrawingBoard implements OnChanges, OnInit, AfterViewInit, OnDest
    * Returns coordinates of a mouse
    */
   getMouseCoords(e: MouseEvent): IPoint {
-
-    const scrollLeft = this.scrollContainer?.scrollLeft || document.documentElement.scrollLeft ||  document.body.scrollLeft;
-    const scrollTop = this.scrollContainer?.scrollTop || document.documentElement.scrollTop ||  document.body.scrollTop;
+    let offsetX = 0;
+    let offsetY = 0;
+    if (this.canvasEl) {
+      const { top, left } = this.canvasEl.nativeElement.getBoundingClientRect();
+      offsetX = left;
+      offsetY = top;
+    }
 
     return {
-      x: e.clientX - this.canvasOffsets.x + Number(scrollLeft),
-      y: e.clientY - this.canvasOffsets.y + Number(scrollTop)
+      x: e.clientX - offsetX,
+      y: e.clientY - offsetY
     }
   };
 
