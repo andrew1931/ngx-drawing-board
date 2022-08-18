@@ -15,11 +15,10 @@ import {
 } from '@angular/core';
 import {
   BehaviorSubject,
-  debounceTime,
   fromEvent,
-  map,
   Subscription
 } from 'rxjs';
+import { debounceTime, map } from 'rxjs/operators';
 import { Renderer } from './renderer';
 import {
   RectangleShape,
